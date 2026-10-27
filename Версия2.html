@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажер устного счета</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', scale: 0.95 }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100%; background: #1a1a2e; font-family: "Times New Roman", Times, serif; color: #e0e0e0; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 3vh 4vw 8vh; }
+  h1 { font-size: clamp(22px, 3.6vw, 36px); text-align: center; color: #fff; margin: 0 0 1vh; }
+  .sub { text-align: center; color: #a0a0c0; font-size: clamp(14px, 1.8vw, 18px); margin: 0 0 3vh; }
+  .panel { background: rgba(255,255,255,0.04); border-left: 4px solid #4a6aff; border-radius: 10px; padding: 2vh 3vw; margin-bottom: 3vh; }
+  .panel label { display: block; font-size: clamp(14px, 1.6vw, 18px); color: #c0c0e8; margin: 1vh 0 0.5vh; }
+  select { width: 100%; background: #2a2a4a; color: #e0e0e0; border: 1.5px solid #4a4a8a; border-radius: 8px; padding: 10px 12px; font-family: inherit; font-size: clamp(14px, 1.6vw, 18px); margin-bottom: 1.5vh; }
+  .btn { display: inline-block; background: #4a6aff; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-family: inherit; font-size: clamp(14px, 1.6vw, 18px); cursor: pointer; transition: background 0.2s; }
+  .btn:hover { background: #6a8aff; }
+  .btn.secondary { background: #2a2a4a; border: 1.5px solid #4a4a8a; color: #c0c0e0; text-decoration: none; display: inline-block; }
+  .btn.secondary:hover { background: #3a3a6a; }
+  .timer { text-align: center; font-size: clamp(20px, 3vw, 32px); color: #ffaa4a; font-weight: bold; margin: 1vh 0 2vh; }
+  .timer.warn { color: #ff6a6a; }
+  .tasks { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2vh 3vw; margin-bottom: 3vh; }
+  @media (max-width: 600px) { .tasks { grid-template-columns: 1fr; } }
+  .task { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 8px 10px; }
+  .task .num { color: #6a6a9a; font-size: clamp(12px, 1.4vw, 15px); min-width: 24px; }
+  .task .expr { flex: 1; font-size: clamp(15px, 1.9vw, 21px); color: #e0e0e0; white-space: nowrap; }
+  .task input { width: 100px; background: #2a2a4a; color: #fff; border: 1.5px solid #4a4a8a; border-radius: 6px; padding: 6px 8px; font-family: inherit; font-size: clamp(14px, 1.6vw, 18px); text-align: center; }
+  .task input:focus { outline: none; border-color: #6a8aff; }
+  .task.correct input { border-color: #6aff8a; background: rgba(106,255,138,0.12); }
+  .task.wrong input { border-color: #ff6a6a; background: rgba(255,106,106,0.12); }
+  .task .mark { min-width: 22px; text-align: center; font-size: 18px; font-weight: bold; }
+  .task.correct .mark { color: #6aff8a; }
+  .task.wrong .mark { color: #ff6a6a; }
+  .result { display: none; background: rgba(74,106,255,0.12); border: 2px solid #4a6aff; border-radius: 12px; padding: 3vh 3vw; text-align: center; margin-bottom: 3vh; }
+  .result.show { display: block; }
+  .result .score { font-size: clamp(28px, 5vw, 48px); color: #fff; font-weight: bold; margin-bottom: 1vh; }
+  .result .grade { font-size: clamp(22px, 3.5vw, 34px); color: #ffaa4a; font-weight: bold; margin-bottom: 1vh; }
+  .result .info { color: #c0c0e0; font-size: clamp(14px, 1.8vw, 19px); }
+  .hidden { display: none !important; }
+  .actions { text-align: center; display: flex; flex-wrap: wrap; gap: 2vw; justify-content: center; margin-top: 2vh; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Тренажер устного счета</h1>
+  <p class="sub">По действиям · по уровням · комбинация приёмов</p>
+  <div class="panel" id="setupPanel">
+    <label for="topic">Тренажёр:</label>
+    <select id="topic">
+      <optgroup label="Десятичные дроби · по действиям">
+        <option value="dec_add">Сложение десятичных дробей</option>
+        <option value="dec_sub">Вычитание десятичных дробей</option>
+        <option value="dec_mul">Умножение десятичных дробей</option>
+        <option value="dec_div">Деление десятичных дробей</option>
+      </optgroup>
+      <optgroup label="Обыкновенные дроби · по действиям">
+        <option value="fr_add">Сложение обыкновенных дробей</option>
+        <option value="fr_sub">Вычитание обыкновенных дробей</option>
+        <option value="fr_mul">Умножение обыкновенных дробей и смешанных чисел</option>
+        <option value="fr_div">Деление обыкновенных дробей и смешанных чисел</option>
+      </optgroup>
+      <optgroup label="Комбинация приёмов (смешанные числа + десятичные дроби)">
+        <option value="combo_add">Сложение и вычитание</option>
+        <option value="combo_mul">Умножение и деление</option>
+      </optgroup>
+      <optgroup label="Положительные и отрицательные числа · по уровням">
+        <option value="neg_A">Уровень A (базовый)</option>
+        <option value="neg_B">Уровень B (средний)</option>
+        <option value="neg_C">Уровень C (повышенный, дроби и смешанные числа)</option>
+        <option value="neg_D">Уровень D (высокий, комбинированные числа)</option>
+      </optgroup>
+    </select>
+    <div class="actions">
+      <button class="btn" onclick="startTest()">Начать тест</button>
+      <a href="index.html" class="btn secondary">← На главную</a>
+    </div>
+  </div>
+  <div class="timer hidden" id="timer">15:00</div>
+  <div class="tasks hidden" id="tasks"></div>
+  <div class="actions hidden" id="checkPanel">
+    <button class="btn" onclick="checkAnswers()">Проверить ответы</button>
+  </div>
+  <div class="result" id="result">
+    <div class="score" id="scoreText">0 / 20</div>
+    <div class="grade" id="gradeText">—</div>
+    <div class="info" id="infoText"></div>
+    <div class="actions">
+      <button class="btn" onclick="restart()">Пройти заново</button>
+      <a href="index.html" class="btn secondary">← На главную</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const BANK = {
+
+  /* ==========================================================
+     ДЕСЯТИЧНЫЕ ДРОБИ · ПО ДЕЙСТВИЯМ
+     ========================================================== */
+  dec_add: [
+    { latex: "5{,}34 + 3{,}46", answer: "8,8" },
+    { latex: "8{,}37 + 5", answer: "13,37" },
+    { latex: "15{,}56 + 4{,}57", answer: "20,13" },
+    { latex: "0{,}96 + 0{,}6", answer: "1,56" },
+    { latex: "2{,}3 + 1{,}763", answer: "4,063" },
+    { latex: "7{,}58 + 1{,}22", answer: "8,8" },
+    { latex: "6{,}49 + 8", answer: "14,49" },
+    { latex: "13{,}65 + 6{,}47", answer: "20,12" },
+    { latex: "0{,}67 + 0{,}8", answer: "1,47" },
+    { latex: "3{,}6 + 2{,}469", answer: "6,069" },
+    { latex: "6{,}37 + 3{,}53", answer: "9,9" },
+    { latex: "8{,}74 + 3", answer: "11,74" },
+    { latex: "25{,}36 + 3{,}66", answer: "29,02" },
+    { latex: "0{,}86 + 0{,}7", answer: "1,56" },
+    { latex: "6{,}5 + 2{,}597", answer: "9,097" },
+    { latex: "8{,}45 + 3{,}25", answer: "11,7" },
+    { latex: "12{,}7 + 5", answer: "17,7" },
+    { latex: "17{,}69 + 3{,}42", answer: "21,11" },
+    { latex: "0{,}77 + 0{,}7", answer: "1,47" },
+    { latex: "5{,}4 + 1{,}668", answer: "7,068" }
+  ],
+  dec_sub: [
+    { latex: "5{,}34 - 3{,}4", answer: "1,94" },
+    { latex: "8{,}37 - 5", answer: "3,37" },
+    { latex: "15{,}56 - 4{,}47", answer: "11,09" },
+    { latex: "0{,}96 - 0{,}6", answer: "0,36" },
+    { latex: "2 - 1{,}763", answer: "0,237" },
+    { latex: "7{,}35 - 3{,}5", answer: "3,85" },
+    { latex: "6{,}87 - 3", answer: "3,87" },
+    { latex: "17{,}34 - 6{,}28", answer: "11,06" },
+    { latex: "0{,}85 - 0{,}5", answer: "0,35" },
+    { latex: "3 - 2{,}876", answer: "0,124" },
+    { latex: "6{,}24 - 2{,}4", answer: "3,84" },
+    { latex: "9{,}73 - 6", answer: "3,73" },
+    { latex: "13{,}54 - 7{,}48", answer: "6,06" },
+    { latex: "0{,}67 - 0{,}7", answer: "-0,03" },
+    { latex: "4 - 3{,}548", answer: "0,452" },
+    { latex: "5{,}16 - 1{,}6", answer: "3,56" },
+    { latex: "8{,}72 - 2", answer: "6,72" },
+    { latex: "11{,}96 - 4{,}88", answer: "7,08" },
+    { latex: "0{,}56 - 0{,}6", answer: "-0,04" },
+    { latex: "5 - 2{,}639", answer: "2,361" }
+  ],
+  dec_mul: [
+    { latex: "1{,}2 \\cdot 400", answer: "480" },
+    { latex: "3{,}6 \\cdot 2", answer: "7,2" },
+    { latex: "4{,}8 \\cdot 0{,}3", answer: "1,44" },
+    { latex: "25 \\cdot 0{,}8", answer: "20" },
+    { latex: "1250 \\cdot 0{,}4", answer: "500" },
+    { latex: "2{,}3 \\cdot 3", answer: "6,9" },
+    { latex: "1{,}9 \\cdot 400", answer: "760" },
+    { latex: "3{,}6 \\cdot 0{,}5", answer: "1,8" },
+    { latex: "2{,}5 \\cdot 0{,}4", answer: "1" },
+    { latex: "12{,}5 \\cdot 80", answer: "1000" },
+    { latex: "3{,}2 \\cdot 30", answer: "96" },
+    { latex: "6{,}6 \\cdot 2", answer: "13,2" },
+    { latex: "2{,}8 \\cdot 0{,}4", answer: "1,12" },
+    { latex: "25 \\cdot 0{,}02", answer: "0,5" },
+    { latex: "400 \\cdot 1{,}25", answer: "500" },
+    { latex: "2{,}1 \\cdot 5", answer: "10,5" },
+    { latex: "7{,}5 \\cdot 200", answer: "1500" },
+    { latex: "3{,}7 \\cdot 0{,}3", answer: "1,11" },
+    { latex: "0{,}16 \\cdot 0{,}5", answer: "0,08" },
+    { latex: "0{,}8 \\cdot 12500", answer: "10000" }
+  ],
+  dec_div: [
+    { latex: "1{,}2 : 40", answer: "0,03" },
+    { latex: "5{,}3 : 2", answer: "2,65" },
+    { latex: "4{,}8 : 1{,}2", answer: "4" },
+    { latex: "0{,}38 : 19", answer: "0,02" },
+    { latex: "1 : 0{,}25", answer: "4" },
+    { latex: "5{,}5 : 2", answer: "2,75" },
+    { latex: "5{,}6 : 1{,}4", answer: "4" },
+    { latex: "0{,}92 : 23", answer: "0,04" },
+    { latex: "2{,}3 : 4{,}6", answer: "0,5" },
+    { latex: "1 : 0{,}8", answer: "1,25" },
+    { latex: "4{,}2 : 700", answer: "0,006" },
+    { latex: "9 : 0{,}015", answer: "600" },
+    { latex: "1 : 4", answer: "0,25" },
+    { latex: "3{,}6 : 200", answer: "0,018" },
+    { latex: "7{,}5 : 1{,}5", answer: "5" },
+    { latex: "0{,}51 : 17", answer: "0,03" },
+    { latex: "1 : 0{,}125", answer: "8" },
+    { latex: "6 : 0{,}012", answer: "500" },
+    { latex: "1{,}1 : 2{,}2", answer: "0,5" },
+    { latex: "2 : 8", answer: "0,25" }
+  ],
+
+  /* ==========================================================
+     ОБЫКНОВЕННЫЕ ДРОБИ · ПО ДЕЙСТВИЯМ
+     ========================================================== */
+  fr_add: [
+    { latex: "\\frac{1}{2} + \\frac{1}{3}", answer: "5/6" },
+    { latex: "\\frac{1}{4} + \\frac{3}{8}", answer: "5/8" },
+    { latex: "\\frac{1}{4} + \\frac{1}{6}", answer: "5/12" },
+    { latex: "\\frac{4}{5} + \\frac{1}{11}", answer: "49/55" },
+    { latex: "\\frac{4}{5} + \\frac{7}{15}", answer: "19/15" },
+    { latex: "\\frac{1}{4} + \\frac{1}{3}", answer: "7/12" },
+    { latex: "\\frac{2}{5} + \\frac{1}{10}", answer: "1/2" },
+    { latex: "\\frac{1}{8} + \\frac{1}{6}", answer: "7/24" },
+    { latex: "\\frac{11}{15} + \\frac{7}{15}", answer: "6/5" },
+    { latex: "\\frac{3}{4} + \\frac{7}{12}", answer: "4/3" },
+    { latex: "\\frac{1}{2} + \\frac{1}{5}", answer: "7/10" },
+    { latex: "\\frac{1}{3} + \\frac{1}{6}", answer: "1/2" },
+    { latex: "\\frac{1}{9} + \\frac{1}{6}", answer: "5/18" },
+    { latex: "\\frac{14}{12} + \\frac{11}{12}", answer: "25/12" },
+    { latex: "\\frac{5}{6} + \\frac{7}{18}", answer: "11/9" },
+    { latex: "\\frac{1}{5} + \\frac{1}{3}", answer: "8/15" },
+    { latex: "\\frac{1}{4} + \\frac{5}{12}", answer: "2/3" },
+    { latex: "\\frac{1}{10} + \\frac{1}{6}", answer: "4/15" },
+    { latex: "\\frac{9}{17} + \\frac{6}{17}", answer: "15/17" },
+    { latex: "\\frac{4}{7} + \\frac{9}{14}", answer: "17/14" }
+  ],
+  fr_sub: [
+    { latex: "\\frac{3}{4} - \\frac{1}{2}", answer: "1/4" },
+    { latex: "\\frac{5}{6} - \\frac{1}{3}", answer: "1/2" },
+    { latex: "\\frac{7}{8} - \\frac{3}{4}", answer: "1/8" },
+    { latex: "\\frac{9}{10} - \\frac{2}{5}", answer: "1/2" },
+    { latex: "\\frac{11}{12} - \\frac{5}{6}", answer: "1/12" },
+    { latex: "\\frac{5}{6} - \\frac{3}{8}", answer: "11/24" },
+    { latex: "\\frac{7}{9} - \\frac{1}{2}", answer: "5/18" },
+    { latex: "\\frac{9}{14} - \\frac{2}{7}", answer: "5/14" },
+    { latex: "\\frac{11}{15} - \\frac{3}{5}", answer: "2/15" },
+    { latex: "\\frac{13}{24} - \\frac{5}{12}", answer: "1/8" },
+    { latex: "\\frac{3}{4} - \\frac{1}{2}", answer: "1/4" },
+    { latex: "\\frac{5}{6} - \\frac{1}{3}", answer: "1/2" },
+    { latex: "\\frac{7}{8} - \\frac{3}{4}", answer: "1/8" },
+    { latex: "\\frac{9}{10} - \\frac{2}{5}", answer: "1/2" },
+    { latex: "\\frac{11}{12} - \\frac{5}{6}", answer: "1/12" },
+    { latex: "\\frac{5}{6} - \\frac{3}{8}", answer: "11/24" },
+    { latex: "\\frac{7}{9} - \\frac{1}{2}", answer: "5/18" },
+    { latex: "\\frac{9}{14} - \\frac{2}{7}", answer: "5/14" },
+    { latex: "\\frac{11}{15} - \\frac{3}{5}", answer: "2/15" },
+    { latex: "\\frac{13}{24} - \\frac{5}{12}", answer: "1/8" }
+  ],
+  fr_mul: [
+    { latex: "\\frac{3}{5} \\cdot \\frac{10}{21}", answer: "2/7" },
+    { latex: "\\frac{4}{9} \\cdot \\frac{3}{8}", answer: "1/6" },
+    { latex: "\\frac{7}{12} \\cdot \\frac{4}{21}", answer: "1/9" },
+    { latex: "\\frac{5}{6} \\cdot \\frac{9}{20}", answer: "3/8" },
+    { latex: "\\frac{8}{15} \\cdot \\frac{5}{16}", answer: "1/6" },
+    { latex: "\\frac{9}{14} \\cdot \\frac{7}{18}", answer: "1/4" },
+    { latex: "\\frac{11}{20} \\cdot \\frac{5}{22}", answer: "1/8" },
+    { latex: "\\frac{13}{24} \\cdot \\frac{8}{39}", answer: "1/9" },
+    { latex: "\\frac{5}{6} \\cdot \\frac{9}{20}", answer: "3/8" },
+    { latex: "\\frac{7}{12} \\cdot \\frac{4}{21}", answer: "1/9" },
+    { latex: "\\frac{8}{15} \\cdot \\frac{5}{16}", answer: "1/6" },
+    { latex: "\\frac{9}{14} \\cdot \\frac{7}{18}", answer: "1/4" },
+    { latex: "\\frac{3}{7} \\cdot \\frac{14}{15}", answer: "2/5" },
+    { latex: "\\frac{4}{9} \\cdot \\frac{3}{16}", answer: "1/12" },
+    { latex: "1\\frac{1}{2} \\cdot \\frac{2}{3}", answer: "1" },
+    { latex: "1\\frac{2}{3} \\cdot 2\\frac{1}{4}", answer: "15/4" },
+    { latex: "2\\frac{2}{5} \\cdot \\frac{5}{12}", answer: "1" },
+    { latex: "2\\frac{1}{2} \\cdot 1\\frac{3}{5}", answer: "4" },
+    { latex: "1\\frac{1}{8} \\cdot 2\\frac{2}{3}", answer: "3" },
+    { latex: "1\\frac{2}{3} \\cdot 2\\frac{1}{4}", answer: "15/4" }
+  ],
+  fr_div: [
+    { latex: "\\frac{7}{8} : \\frac{21}{32}", answer: "4/3" },
+    { latex: "\\frac{15}{16} : \\frac{5}{8}", answer: "3/2" },
+    { latex: "\\frac{9}{16} : \\frac{27}{32}", answer: "2/3" },
+    { latex: "\\frac{21}{25} : \\frac{7}{10}", answer: "6/5" },
+    { latex: "\\frac{5}{8} : \\frac{15}{16}", answer: "2/3" },
+    { latex: "\\frac{14}{15} : \\frac{7}{30}", answer: "4" },
+    { latex: "\\frac{18}{25} : \\frac{9}{50}", answer: "4" },
+    { latex: "\\frac{24}{35} : \\frac{8}{21}", answer: "9/5" },
+    { latex: "\\frac{9}{16} : \\frac{27}{32}", answer: "2/3" },
+    { latex: "\\frac{21}{25} : \\frac{7}{10}", answer: "6/5" },
+    { latex: "\\frac{5}{8} : \\frac{15}{16}", answer: "2/3" },
+    { latex: "\\frac{14}{15} : \\frac{7}{30}", answer: "4" },
+    { latex: "\\frac{7}{8} : \\frac{21}{32}", answer: "4/3" },
+    { latex: "\\frac{15}{16} : \\frac{5}{8}", answer: "3/2" },
+    { latex: "2\\frac{1}{4} : 1\\frac{1}{2}", answer: "3/2" },
+    { latex: "3\\frac{1}{3} : 1\\frac{2}{5}", answer: "50/21" },
+    { latex: "3\\frac{1}{3} : 1\\frac{2}{3}", answer: "2" },
+    { latex: "4\\frac{1}{6} : 2\\frac{1}{12}", answer: "2" },
+    { latex: "4\\frac{1}{6} : 2\\frac{1}{12}", answer: "2" },
+    { latex: "2\\frac{1}{4} : 1\\frac{1}{8}", answer: "2" }
+  ],
+
+  /* ==========================================================
+     КОМБИНАЦИЯ ПРИЁМОВ
+     ========================================================== */
+  combo_add: [
+    { latex: "2\\frac{1}{2} + 1{,}25", answer: "3,75" },
+    { latex: "3{,}75 + 1\\frac{1}{4}", answer: "5" },
+    { latex: "4\\frac{2}{5} - 1{,}6", answer: "2,8" },
+    { latex: "5{,}5 - 2\\frac{1}{4}", answer: "3,25" },
+    { latex: "1\\frac{3}{4} + 2{,}5", answer: "4,25" },
+    { latex: "6{,}25 - 3\\frac{1}{2}", answer: "2,75" },
+    { latex: "2\\frac{2}{3} + 0{,}75", answer: "41/12" },
+    { latex: "7{,}5 - 4\\frac{3}{4}", answer: "2,75" },
+    { latex: "1\\frac{3}{4} + 2{,}25", answer: "4" },
+    { latex: "4{,}5 + 1\\frac{1}{2}", answer: "6" },
+    { latex: "3\\frac{1}{5} - 1{,}4", answer: "1,8" },
+    { latex: "6{,}75 - 2\\frac{1}{4}", answer: "4,5" },
+    { latex: "2\\frac{2}{3} + 0{,}5", answer: "19/6" },
+    { latex: "5{,}25 - 1\\frac{3}{4}", answer: "3,5" },
+    { latex: "1\\frac{1}{6} + 2{,}5", answer: "11/3" },
+    { latex: "7{,}5 - 3\\frac{1}{2}", answer: "4" },
+    { latex: "1\\frac{2}{3} + 2{,}25", answer: "47/12" },
+    { latex: "4{,}5 - 1\\frac{3}{4}", answer: "2,75" },
+    { latex: "5\\frac{1}{6} - 2{,}75", answer: "29/12" },
+    { latex: "2\\frac{1}{4} + 1{,}75", answer: "4" }
+  ],
+  combo_mul: [
+    { latex: "1\\frac{1}{2} \\cdot 0{,}4", answer: "0,6" },
+    { latex: "0{,}6 \\cdot 2\\frac{1}{2}", answer: "1,5" },
+    { latex: "3\\frac{1}{3} : 0{,}5", answer: "20/3" },
+    { latex: "1{,}2 : 2\\frac{2}{5}", answer: "0,5" },
+    { latex: "2\\frac{1}{4} \\cdot 1{,}6", answer: "3,6" },
+    { latex: "0{,}75 : 1\\frac{1}{2}", answer: "0,5" },
+    { latex: "4\\frac{1}{6} \\cdot 0{,}3", answer: "1,25" },
+    { latex: "2{,}4 : 3\\frac{1}{3}", answer: "0,72" },
+    { latex: "1\\frac{1}{4} \\cdot 0{,}8", answer: "1" },
+    { latex: "0{,}5 \\cdot 2\\frac{1}{2}", answer: "1,25" },
+    { latex: "2\\frac{1}{3} : 0{,}7", answer: "10/3" },
+    { latex: "1{,}5 : 1\\frac{1}{2}", answer: "1" },
+    { latex: "3\\frac{1}{2} \\cdot 0{,}6", answer: "2,1" },
+    { latex: "0{,}9 : 1\\frac{1}{8}", answer: "0,8" },
+    { latex: "2\\frac{1}{6} \\cdot 1{,}2", answer: "2,6" },
+    { latex: "4{,}8 : 2\\frac{2}{5}", answer: "2" },
+    { latex: "2\\frac{2}{5} \\cdot 1{,}5", answer: "3,6" },
+    { latex: "3{,}6 : 1\\frac{1}{5}", answer: "3" },
+    { latex: "4\\frac{1}{2} \\cdot 0{,}8", answer: "3,6" },
+    { latex: "2{,}5 : 1\\frac{2}{3}", answer: "1,5" }
+  ],
+
+  /* ==========================================================
+     ПОЛОЖИТЕЛЬНЫЕ И ОТРИЦАТЕЛЬНЫЕ ЧИСЛА · УРОВНИ A и B
+     (из присланного документа, варианты 1.1–1.6)
+     ========================================================== */
+  neg_A: [
+    { latex: "-46 + (-46)", answer: "-92" },
+    { latex: "-93 + 7", answer: "-86" },
+    { latex: "15 + (-15)", answer: "0" },
+    { latex: "-9 + 58", answer: "49" },
+    { latex: "0 + (-18)", answer: "-18" },
+    { latex: "81 + (-19)", answer: "62" },
+    { latex: "-13 + (-64)", answer: "-77" },
+    { latex: "-5 + 0", answer: "-5" },
+    { latex: "36 + (-36)", answer: "0" },
+    { latex: "21 + (-59)", answer: "-38" },
+    { latex: "(-94) + 6", answer: "-88" },
+    { latex: "-12 + 12", answer: "0" },
+    { latex: "-47 + 47", answer: "0" },
+    { latex: "82 + (-18)", answer: "64" },
+    { latex: "43 + (-43)", answer: "0" },
+    { latex: "-39 + (-45)", answer: "-84" },
+    { latex: "36 + (-36)", answer: "0" },
+    { latex: "0 + (-35)", answer: "-35" },
+    { latex: "-19 + (-19)", answer: "-38" },
+    { latex: "(-9) + 89", answer: "80" }
+  ],
+  neg_B: [
+    { latex: "-8{,}8 + 44{,}12", answer: "35,32" },
+    { latex: "-12{,}6 + 0", answer: "-12,6" },
+    { latex: "57{,}2 + (-2{,}8)", answer: "54,4" },
+    { latex: "(-5) + 14{,}8", answer: "9,8" },
+    { latex: "3{,}39 + (-0{,}39)", answer: "3" },
+    { latex: "26{,}4 + (-26{,}4)", answer: "0" },
+    { latex: "-1{,}8 + (-1{,}8)", answer: "-3,6" },
+    { latex: "(-93{,}9) + (-7{,}51)", answer: "-101,41" },
+    { latex: "6{,}17 + (-14{,}97)", answer: "-8,8" },
+    { latex: "15{,}13 + (-64{,}87)", answer: "-49,74" },
+    { latex: "-91{,}77 + 171", answer: "79,23" },
+    { latex: "(-19{,}9) + 89{,}45", answer: "69,55" },
+    { latex: "-4{,}63 + (-1{,}63)", answer: "-6,26" },
+    { latex: "-3{,}2 + (-3{,}2)", answer: "-6,4" },
+    { latex: "(-9{,}74) + 15", answer: "5,26" },
+    { latex: "(-37{,}73) + (-193{,}33)", answer: "-231,06" },
+    { latex: "8{,}33 + (-31{,}67)", answer: "-23,34" },
+    { latex: "-27{,}9 + 0", answer: "-27,9" },
+    { latex: "-2{,}47 + 2{,}4", answer: "-0,07" },
+    { latex: "(-77{,}5) + 2{,}5", answer: "-75" }
+  ],
+
+  /* ==========================================================
+     УРОВЕНЬ C — ТОЛЬКО ОБЫКНОВЕННЫЕ ДРОБИ И СМЕШАННЫЕ ЧИСЛА
+     С РАЗНЫМИ ЗНАКАМИ. Все примеры проверены.
+     ========================================================== */
+  neg_C: [
+    // Сложение с разными знаками
+    { latex: "-\\frac{1}{2} + \\frac{1}{3}", answer: "-1/6" },
+    { latex: "-\\frac{3}{4} + \\frac{1}{4}", answer: "-1/2" },
+    { latex: "\\frac{2}{3} + \\left(-\\frac{1}{6}\\right)", answer: "1/2" },
+    // Вычитание
+    { latex: "-\\frac{3}{5} - \\frac{1}{5}", answer: "-4/5" },
+    { latex: "\\frac{1}{4} - \\frac{3}{4}", answer: "-1/2" },
+    { latex: "-\\frac{1}{2} - \\left(-\\frac{1}{3}\\right)", answer: "-1/6" },
+    // Умножение
+    { latex: "-\\frac{2}{3} \\cdot \\frac{3}{4}", answer: "-1/2" },
+    { latex: "\\left(-\\frac{3}{5}\\right) \\cdot \\left(-\\frac{5}{6}\\right)", answer: "1/2" },
+    { latex: "\\frac{4}{7} \\cdot \\left(-\\frac{7}{8}\\right)", answer: "-1/2" },
+    // Деление
+    { latex: "\\left(-\\frac{3}{4}\\right) : \\frac{3}{8}", answer: "-2" },
+    { latex: "\\frac{2}{5} : \\left(-\\frac{4}{15}\\right)", answer: "-3/2" },
+    { latex: "\\left(-\\frac{5}{6}\\right) : \\left(-\\frac{10}{12}\\right)", answer: "1" },
+    // Смешанные числа
+    { latex: "-1\\frac{1}{2} + \\frac{3}{4}", answer: "-3/4" },
+    { latex: "2\\frac{1}{3} - 3\\frac{1}{3}", answer: "-1" },
+    { latex: "-2\\frac{1}{2} \\cdot \\frac{2}{5}", answer: "-1" },
+    { latex: "\\left(-3\\frac{1}{3}\\right) : \\left(-1\\frac{2}{3}\\right)", answer: "2" },
+    // Степени с дробями
+    { latex: "\\left(-\\frac{1}{2}\\right)^2", answer: "1/4" },
+    { latex: "\\left(-\\frac{2}{3}\\right)^2", answer: "4/9" },
+    { latex: "\\left(-\\frac{1}{3}\\right)^3", answer: "-1/27" },
+    { latex: "-\\left(\\frac{1}{2}\\right)^3", answer: "-1/8" }
+  ],
+
+  /* ==========================================================
+     УРОВЕНЬ D — КОМБИНИРОВАННЫЕ ЧИСЛА
+     (десятичная дробь + обыкновенная/смешанная, с разными знаками).
+     Все примеры проверены.
+     ========================================================== */
+  neg_D: [
+    // Десятичная + обыкновенная
+    { latex: "-0{,}5 + \\frac{1}{4}", answer: "-0,25" },
+    { latex: "\\frac{3}{4} - 1{,}25", answer: "-0,5" },
+    { latex: "-1{,}5 + \\frac{1}{2}", answer: "-1" },
+    { latex: "0{,}75 - \\frac{5}{4}", answer: "-0,5" },
+    // Десятичная × обыкновенная
+    { latex: "-0{,}6 \\cdot \\frac{5}{6}", answer: "-0,5" },
+    { latex: "\\frac{3}{4} \\cdot (-0{,}8)", answer: "-0,6" },
+    { latex: "-1{,}2 \\cdot \\left(-\\frac{5}{6}\\right)", answer: "1" },
+    // Десятичная : обыкновенная
+    { latex: "\\left(-\\frac{3}{4}\\right) : 0{,}25", answer: "-3" },
+    { latex: "-0{,}9 : \\frac{3}{10}", answer: "-3" },
+    { latex: "\\frac{5}{8} : (-0{,}5)", answer: "-5/4" },
+    // Смешанное + десятичная
+    { latex: "-2\\frac{1}{2} + 1{,}5", answer: "-1" },
+    { latex: "3\\frac{3}{4} - 4{,}25", answer: "-0,5" },
+    { latex: "-1\\frac{1}{4} + 0{,}75", answer: "-0,5" },
+    // Смешанное × десятичная
+    { latex: "-1\\frac{1}{2} \\cdot 0{,}4", answer: "-0,6" },
+    { latex: "2\\frac{1}{2} \\cdot (-0{,}6)", answer: "-1,5" },
+    { latex: "-3\\frac{1}{3} \\cdot \\left(-0{,}3\\right)", answer: "1" },
+    // Смешанное : десятичная
+    { latex: "\\left(-2\\frac{1}{2}\\right) : 0{,}5", answer: "-5" },
+    { latex: "1{,}5 : \\left(-\\frac{3}{4}\\right)", answer: "-2" },
+    { latex: "-0{,}8 : 2\\frac{2}{3}", answer: "-0,3" },
+    { latex: "\\left(-1\\frac{1}{2}\\right) : (-0{,}3)", answer: "5" }
+  ]
+};
+
+let tasks = [];
+let timerInterval = null;
+let secondsLeft = 0;
+let testActive = false;
+
+function normalize(s) {
+  return String(s).trim().toLowerCase().replace(/\s+/g, '').replace(',', '.');
+}
+
+function startTest() {
+  const key = document.getElementById('topic').value;
+  tasks = BANK[key].map(t => ({ latex: t.latex, answer: t.answer }));
+  const tasksEl = document.getElementById('tasks');
+  tasksEl.innerHTML = '';
+  tasks.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'task';
+    div.id = 'task-' + i;
+    div.innerHTML = `
+      <span class="num">${i + 1}.</span>
+      <span class="expr">\\(${t.latex}\\)</span>
+      <input type="text" id="inp-${i}" autocomplete="off" inputmode="text" placeholder="?">
+      <span class="mark" id="mark-${i}"></span>
+    `;
+    tasksEl.appendChild(div);
+  });
+  document.getElementById('setupPanel').classList.add('hidden');
+  document.getElementById('tasks').classList.remove('hidden');
+  document.getElementById('checkPanel').classList.remove('hidden');
+  document.getElementById('timer').classList.remove('hidden');
+  document.getElementById('result').classList.remove('show');
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([tasksEl]).catch(() => {});
+  }
+  secondsLeft = 15 * 60;
+  updateTimerDisplay();
+  if (timerInterval) clearInterval(timerInterval);
+  testActive = true;
+  timerInterval = setInterval(() => {
+    if (!testActive) return;
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      secondsLeft = 0;
+      updateTimerDisplay();
+      clearInterval(timerInterval);
+      checkAnswers();
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+  setTimeout(() => {
+    const first = document.getElementById('inp-0');
+    if (first) first.focus();
+  }, 300);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  const el = document.getElementById('timer');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (secondsLeft <= 60) el.classList.add('warn');
+  else el.classList.remove('warn');
+}
+
+function checkAnswers() {
+  if (!testActive) return;
+  testActive = false;
+  clearInterval(timerInterval);
+  let correct = 0;
+  const total = tasks.length;
+  tasks.forEach((t, i) => {
+    const inp = document.getElementById('inp-' + i);
+    const taskEl = document.getElementById('task-' + i);
+    const markEl = document.getElementById('mark-' + i);
+    const userAns = normalize(inp.value);
+    const correctAns = normalize(t.answer);
+    if (userAns === correctAns) {
+      correct++;
+      taskEl.classList.add('correct');
+      markEl.textContent = '✓';
+    } else {
+      taskEl.classList.add('wrong');
+      markEl.textContent = '✗';
+    }
+    inp.disabled = true;
+  });
+  let grade;
+  const pct = correct / total;
+  if (pct >= 0.95) grade = '5';
+  else if (pct >= 0.80) grade = '4';
+  else if (pct >= 0.60) grade = '3';
+  else grade = '2';
+  document.getElementById('scoreText').textContent = `${correct} / ${total} (${Math.round(pct * 100)}%)`;
+  document.getElementById('gradeText').textContent = `Оценка: ${grade}`;
+  document.getElementById('infoText').innerHTML = `Критерии: «5» — 95–100%, «4» — 80–90%, «3» — 60–75%, «2» — менее 60%.`;
+  document.getElementById('result').classList.add('show');
+  document.getElementById('checkPanel').classList.add('hidden');
+  document.getElementById('timer').classList.add('hidden');
+}
+
+function restart() {
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('setupPanel').classList.remove('hidden');
+  document.getElementById('tasks').classList.add('hidden');
+  document.getElementById('tasks').innerHTML = '';
+  document.getElementById('checkPanel').classList.add('hidden');
+  document.getElementById('timer').classList.add('hidden');
+  testActive = false;
+  if (timerInterval) clearInterval(timerInterval);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || !testActive) return;
+  const active = document.activeElement;
+  if (!active || !active.id || !active.id.startsWith('inp-')) return;
+  const idx = parseInt(active.id.split('-')[1], 10);
+  if (idx < tasks.length - 1) {
+    document.getElementById('inp-' + (idx + 1)).focus();
+  } else {
+    checkAnswers();
+  }
+});
+</script>
+</body>
+</html>
