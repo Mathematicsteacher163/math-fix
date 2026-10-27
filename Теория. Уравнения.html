@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Презентация: Уравнения с одной переменной (7 класс)</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', scale: 0.95 }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  /* ===== Базовые настройки ===== */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #1a1a2e;
+    font-family: "Times New Roman", Times, serif;
+    color: #e0e0e0;
+    overflow: hidden;
+  }
+
+  /* ===== Слайдер ===== */
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3vh 5vw;
+    animation: fadeIn 0.4s ease;
+    overflow-y: auto;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Типографика ===== */
+  h1 {
+    font-size: clamp(26px, 4vw, 48px);
+    text-align: center;
+    margin: 0 0 2vh;
+    line-height: 1.3;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  h2 {
+    font-size: clamp(20px, 3vw, 36px);
+    text-align: center;
+    margin: 0 0 3vh;
+    color: #ffffff;
+    border-bottom: 2px solid #4a4a8a;
+    padding-bottom: 1.5vh;
+    width: 100%;
+    max-width: 1100px;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: clamp(18px, 2.4vw, 28px);
+    color: #c0c0e8;
+    margin: 1.5vh 0 1vh;
+    text-align: left;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  p, li {
+    font-size: clamp(16px, 2vw, 24px);
+    line-height: 1.5;
+    color: #d0d0f0;
+    margin: 0.8vh 0;
+  }
+
+  ul {
+    padding-left: 3vw;
+    margin: 1vh 0;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  li {
+    margin-bottom: 0.8vh;
+  }
+
+  /* ===== Контентные блоки ===== */
+  .content-box {
+    width: 100%;
+    max-width: 1100px;
+    background: rgba(255,255,255,0.04);
+    border-left: 4px solid #4a6aff;
+    border-radius: 8px;
+    padding: 1.5vh 3vw;
+    margin-bottom: 1.5vh;
+  }
+
+  .highlight-box {
+    background: rgba(255, 170, 74, 0.1);
+    border-left-color: #ffaa4a;
+  }
+
+  .formula-box {
+    font-size: clamp(20px, 2.6vw, 32px);
+    text-align: center;
+    margin: 1.5vh 0;
+    color: #ffffff;
+    background: rgba(74, 106, 255, 0.1);
+    padding: 1.5vh;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .highlight { color: #ffaa4a; font-weight: bold; }
+
+  .flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5vw 4vw;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .flex-item {
+    flex: 1 1 300px;
+  }
+
+  .example-box {
+    background: rgba(0, 255, 100, 0.05);
+    border-left: 4px solid #6aff8a;
+    padding: 1vh 3vw;
+    border-radius: 8px;
+    margin-top: 1vh;
+  }
+
+  /* ===== Навигация ===== */
+  .nav {
+    position: fixed;
+    bottom: 2vh;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2vw;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .nav button {
+    pointer-events: auto;
+    background: #2a2a4a;
+    color: #c0c0e0;
+    border: 1.5px solid #4a4a8a;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: clamp(14px, 1.4vw, 18px);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .nav button:hover {
+    background: #3a3a6a;
+    border-color: #6a6ab0;
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .nav .counter {
+    color: #6a6a9a;
+    font-size: clamp(14px, 1.4vw, 18px);
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* ===== Прогресс-бар ===== */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4a6aff, #7a4aff);
+    transition: width 0.35s ease;
+    z-index: 200;
+  }
+
+  /* ===== Подсказка ===== */
+  .hint {
+    position: fixed;
+    top: 2vh;
+    right: 2vw;
+    font-size: 13px;
+    color: #4a4a6a;
+    z-index: 100;
+    font-family: sans-serif;
+  }
+
+  /* ===== Печать ===== */
+  @media print {
+    html, body { background: #fff; overflow: visible; height: auto; }
+    .presentation { display: block; height: auto; }
+    .slide {
+      display: block !important;
+      page-break-after: always;
+      padding: 12mm;
+      color: #000;
+      background: #fff;
+      overflow: visible;
+    }
+    .slide h1, .slide h2, .slide h3 { color: #000; }
+    .slide h2 { border-bottom-color: #888; }
+    p, li, .content-box, .formula-box, .example-box { color: #000; }
+    .content-box { background: #f5f5f5; border-color: #888; }
+    .formula-box { background: #f0f0f0; }
+    .highlight-box { background: #fff4e5; }
+    .example-box { background: #f0fff4; }
+    .nav, .progress, .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Прогресс-бар -->
+<div class="progress" id="progressBar"></div>
+
+<!-- Подсказка -->
+<div class="hint">← → для навигации</div>
+
+<!-- Навигация -->
+<div class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)">← Назад</button>
+  <span class="counter" id="counter">1 / 7</span>
+  <button id="nextBtn" onclick="changeSlide(1)">Вперёд →</button>
+</div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ===== СЛАЙД 1: Титульный ===== -->
+  <section class="slide active" data-index="0">
+    <h1>Уравнения с одной переменной</h1>
+    <p style="font-size: clamp(18px, 2.2vw, 28px); color: #a0a0c0;">7 класс · краткая теория и примеры</p>
+  </section>
+
+  <!-- ===== СЛАЙД 2: Корень и равносильность ===== -->
+  <section class="slide" data-index="1">
+    <h2>Корень уравнения и равносильность</h2>
+    <div class="flex-row">
+      <div class="flex-item content-box highlight-box">
+        <h3>🔑 Корень уравнения</h3>
+        <p>Значение переменной, при котором уравнение превращается в верное равенство.</p>
+        <p><strong>Решить уравнение</strong> — найти все корни или доказать, что их нет.</p>
+        <div class="example-box" style="background: transparent; border: none; padding: 0;">
+          <p><em>Пример:</em> \(3x - 6 = 0\)</p>
+          <p>При \(x=2\): \(3\cdot2 - 6 = 0\) — корень.</p>
+          <p>При \(x=5\): \(3\cdot5 - 6 = 9 \neq 0\) — не корень.</p>
+        </div>
+      </div>
+      <div class="flex-item content-box">
+        <h3>⚖️ Равносильные уравнения</h3>
+        <p>Уравнения с одинаковыми корнями (или оба без корней).</p>
+        <p><strong>Свойства:</strong></p>
+        <ul>
+          <li>Перенос слагаемых со сменой знака.</li>
+          <li>Умножение/деление обеих частей на число \(\neq 0\).</li>
+        </ul>
+        <p><em>Пример:</em> \(2x - 4 = 6\) и \(2x = 10\) — равносильны (\(x=5\)).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 3: Как решать ===== -->
+  <section class="slide" data-index="2">
+    <h2>Как решать уравнения</h2>
+    <div class="flex-row">
+      <div class="flex-item content-box">
+        <h3>🔹 Перенос</h3>
+        <div class="formula-box" style="font-size: clamp(18px, 2.2vw, 28px);">
+          \(x + a = b \Leftrightarrow x = b - a\)
+        </div>
+      </div>
+      <div class="flex-item content-box">
+        <h3>🔹 Умножение / деление</h3>
+        <div class="formula-box" style="font-size: clamp(18px, 2.2vw, 28px);">
+          \(k \cdot x = b \Leftrightarrow x = b / k\)
+        </div>
+      </div>
+    </div>
+    <div class="content-box example-box">
+      <h3>Пример решения:</h3>
+      <p>\(5x - 7 = 3x + 9\)</p>
+      <p>1. Переносим с заменой знака: \(5x - 3x = 9 + 7\)</p>
+      <p>2. Приводим подобные: \(2x = 16\)</p>
+      <p>3. Делим на 2: <strong>\(x = 8\)</strong></p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 4: Линейные и с дробями ===== -->
+  <section class="slide" data-index="3">
+    <h2>Линейные уравнения и дроби</h2>
+    <div class="content-box">
+      <h3>\(ax + b = 0\)</h3>
+      <ul>
+        <li>\(a \neq 0\) — один корень \(x = -b / a\)</li>
+        <li>\(a = 0, b = 0\) — бесконечно много корней</li>
+        <li>\(a = 0, b \neq 0\) — корней нет</li>
+      </ul>
+    </div>
+    <div class="content-box highlight-box">
+      <h3>Дроби (ОДЗ)</h3>
+      <p>Знаменатель не равен нулю!</p>
+      <div class="formula-box" style="background: transparent; font-size: clamp(18px, 2.2vw, 26px);">
+        \(\frac{A}{B} = 0 \Leftrightarrow A = 0, B \neq 0\)
+      </div>
+      <p><em>Пример:</em> \(\frac{x - 2}{x + 1} = 0 \Rightarrow x = 2\) (т.к. \(x \neq -1\)).</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 5: Произведение скобок ===== -->
+  <section class="slide" data-index="4">
+    <h2>Произведение скобок равно нулю</h2>
+    <div class="content-box">
+      <p>Если \(A \cdot B = 0\), то <strong>хотя бы один из множителей равен нулю</strong>.</p>
+      <div class="formula-box">
+        \((x - a)(x - b) = 0 \Leftrightarrow x = a\) или \(x = b\)
+      </div>
+    </div>
+    <div class="content-box example-box">
+      <h3>Примеры:</h3>
+      <p>1) \((x - 3)(x + 5) = 0\)</p>
+      <p>\(x - 3 = 0 \Rightarrow x = 3\) <br> \(x + 5 = 0 \Rightarrow x = -5\)</p>
+      <p><strong>Ответ: \(-5; 3\).</strong></p>
+      <br>
+      <p>2) \((2x - 4)(3x + 9) = 0\)</p>
+      <p>\(2x = 4 \Rightarrow x = 2\) <br> \(3x = -9 \Rightarrow x = -3\)</p>
+      <p><strong>Ответ: \(-3; 2\).</strong></p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 6: Модуль ===== -->
+  <section class="slide" data-index="5">
+    <h2>Уравнения с модулем</h2>
+    <div class="content-box">
+      <h3>1. Модуль равен числу</h3>
+      <div class="formula-box">
+        \(|x| = a \quad (a \ge 0) \Leftrightarrow x = a\) или \(x = -a\)
+      </div>
+      <p><em>Пример:</em> \(|x - 3| = 5 \Rightarrow x = 8\) или \(x = -2\).</p>
+    </div>
+    <div class="content-box">
+      <h3>2. Модуль равен модулю</h3>
+      <div class="formula-box">
+        \(|x| = |y| \Leftrightarrow x = y\) или \(x = -y\)
+      </div>
+      <p><em>Пример:</em> \(|x + 1| = |2x - 3|\)</p>
+      <p>\(x + 1 = 2x - 3 \Rightarrow x = 4\)</p>
+      <p>\(x + 1 = -(2x - 3) \Rightarrow 3x = 2 \Rightarrow x = \frac{2}{3}\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 7: Важное напоминание ===== -->
+  <section class="slide" data-index="6">
+    <h2>⚠️ Важно помнить</h2>
+    <div class="content-box highlight-box">
+      <ul>
+        <li>Приём с произведением работает <strong>только если справа стоит 0</strong>. Иначе — переносим всё влево и раскладываем на множители.</li>
+        <li>После возведения в квадрат или умножения на выражение с переменной <strong>обязательно проверяй корни</strong> (могут появиться посторонние).</li>
+        <li>При переносе слагаемых и делении на число (не ноль) корни <strong>не теряются</strong>.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progressBar');
+
+  function showSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= total) index = total - 1;
+
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    current = index;
+
+    counter.textContent = (current + 1) + ' / ' + total;
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+    progressBar.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function changeSlide(delta) {
+    showSlide(current + delta);
+  }
+
+  // Клавиатура
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      changeSlide(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      changeSlide(-1);
+    } else if (e.key === 'Home') {
+      showSlide(0);
+    } else if (e.key === 'End') {
+      showSlide(total - 1);
+    }
+  });
+
+  // Свайпы
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      changeSlide(diff > 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>

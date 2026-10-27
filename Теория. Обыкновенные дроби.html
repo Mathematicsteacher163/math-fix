@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Презентация: Правила действий с обыкновенными дробями</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', scale: 0.95 }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  /* ===== Базовые настройки ===== */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #1a1a2e;
+    font-family: "Times New Roman", Times, serif;
+    color: #e0e0e0;
+    overflow: hidden;
+  }
+
+  /* ===== Слайдер ===== */
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3vh 5vw;
+    animation: fadeIn 0.4s ease;
+    overflow-y: auto;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Типографика ===== */
+  h1 {
+    font-size: clamp(26px, 4vw, 48px);
+    text-align: center;
+    margin: 0 0 2vh;
+    line-height: 1.3;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  h2 {
+    font-size: clamp(20px, 3vw, 38px);
+    text-align: center;
+    margin: 0 0 3vh;
+    color: #ffffff;
+    border-bottom: 2px solid #4a4a8a;
+    padding-bottom: 1.5vh;
+    width: 100%;
+    max-width: 1100px;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: clamp(18px, 2.4vw, 28px);
+    color: #c0c0e8;
+    margin: 2vh 0 1vh;
+    text-align: left;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  p, li {
+    font-size: clamp(16px, 2vw, 24px);
+    line-height: 1.6;
+    color: #d0d0f0;
+    margin: 1vh 0;
+  }
+
+  ul, ol {
+    padding-left: 3vw;
+    margin: 1vh 0;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  li {
+    margin-bottom: 1vh;
+  }
+
+  /* ===== Контентные блоки ===== */
+  .content-box {
+    width: 100%;
+    max-width: 1100px;
+    background: rgba(255,255,255,0.04);
+    border-left: 4px solid #4a6aff;
+    border-radius: 8px;
+    padding: 2vh 3vw;
+    margin-bottom: 2vh;
+  }
+
+  .formula-box {
+    font-size: clamp(20px, 2.6vw, 32px);
+    text-align: center;
+    margin: 2vh 0;
+    color: #ffffff;
+    background: rgba(74, 106, 255, 0.1);
+    padding: 2vh;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  .highlight { color: #ffaa4a; font-weight: bold; }
+
+  .flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2vw 4vw;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 1.5vh;
+  }
+
+  .flex-item {
+    flex: 1 1 250px;
+    font-size: clamp(16px, 2vw, 24px);
+  }
+
+  /* ===== Навигация ===== */
+  .nav {
+    position: fixed;
+    bottom: 2vh;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2vw;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .nav button {
+    pointer-events: auto;
+    background: #2a2a4a;
+    color: #c0c0e0;
+    border: 1.5px solid #4a4a8a;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: clamp(14px, 1.4vw, 18px);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .nav button:hover {
+    background: #3a3a6a;
+    border-color: #6a6ab0;
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .nav .counter {
+    color: #6a6a9a;
+    font-size: clamp(14px, 1.4vw, 18px);
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* ===== Прогресс-бар ===== */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4a6aff, #7a4aff);
+    transition: width 0.35s ease;
+    z-index: 200;
+  }
+
+  /* ===== Подсказка ===== */
+  .hint {
+    position: fixed;
+    top: 2vh;
+    right: 2vw;
+    font-size: 13px;
+    color: #4a4a6a;
+    z-index: 100;
+    font-family: sans-serif;
+  }
+
+  /* ===== Печать ===== */
+  @media print {
+    html, body { background: #fff; overflow: visible; height: auto; }
+    .presentation { display: block; height: auto; }
+    .slide {
+      display: block !important;
+      page-break-after: always;
+      padding: 12mm;
+      color: #000;
+      background: #fff;
+      overflow: visible;
+    }
+    .slide h1, .slide h2, .slide h3 { color: #000; }
+    .slide h2 { border-bottom-color: #888; }
+    p, li, .content-box, .formula-box { color: #000; }
+    .content-box { background: #f5f5f5; border-color: #888; }
+    .formula-box { background: #f0f0f0; }
+    .nav, .progress, .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Прогресс-бар -->
+<div class="progress" id="progressBar"></div>
+
+<!-- Подсказка -->
+<div class="hint">← → для навигации</div>
+
+<!-- Навигация -->
+<div class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)">← Назад</button>
+  <span class="counter" id="counter">1 / 19</span>
+  <button id="nextBtn" onclick="changeSlide(1)">Вперёд →</button>
+</div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ===== СЛАЙД 1: Титульный ===== -->
+  <section class="slide active" data-index="0">
+    <h1>Правила действий<br>с обыкновенными дробями</h1>
+  </section>
+
+  <!-- ===== СЛАЙД 2: Сокращение 1 ===== -->
+  <section class="slide" data-index="1">
+    <h2>Основное свойство дроби. Сокращение дроби</h2>
+    <div class="content-box">
+      <p>Значение дроби не изменится, если разделить её числитель и знаменатель на одно и то же число, отличное от нуля. Деление числителя и знаменателя на их общий делитель называется <strong>сокращением дроби</strong>.</p>
+      <p><strong>Пример 1.</strong> Сократим дробь \(\frac{20}{40}\). Чтобы сократить эту дробь, нужно числитель и знаменатель этой дроби разделить на наибольший общий делитель чисел 20 и 40. НОД(20 и 40)=20. Значит, делим числитель и знаменатель дроби на 20:</p>
+      <div class="formula-box">
+        \[ \frac{20}{40} = \frac{20:20}{40:20} = \frac{1}{2} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 3: Сокращение 2 ===== -->
+  <section class="slide" data-index="2">
+    <h2>Сокращение дроби (продолжение)</h2>
+    <div class="content-box">
+      <p><strong>Пример 2.</strong> Сократим дробь \(\frac{32}{36}\). Чтобы сократить эту дробь, нужно числитель и знаменатель этой дроби разделить на наибольший общий делитель чисел 32 и 36. НОД(32 и 36)=4. Значит, делим числитель и знаменатель дроби на 4:</p>
+      <div class="formula-box">
+        \[ \frac{32}{36} = \frac{32:4}{36:4} = \frac{8}{9} \]
+      </div>
+      <p><strong>Пример 3.</strong> Также дроби можно сокращать, предварительно разложив на множители числитель и знаменатель. Например, сократим дробь \(\frac{9}{27}\), предварительно разложив на множители числитель и знаменатель:</p>
+      <div class="formula-box">
+        \[ \frac{9}{27} = \frac{3 \cdot 3}{3 \cdot 3 \cdot 3} = \frac{1 \cdot 1}{1 \cdot 1 \cdot 3} = \frac{1}{3} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 4: Сокращение 3 ===== -->
+  <section class="slide" data-index="3">
+    <h2>Сокращение дроби (продолжение)</h2>
+    <div class="content-box">
+      <p><strong>Пример 4.</strong> Сократим дробь \(\frac{18}{27}\). Чтобы сократить эту дробь, нужно ее числитель и знаменатель разделить на наибольший общий делитель чисел 18 и 27. НОД(18 и 27)=9. Значит, делим числитель и знаменатель дроби на 9:</p>
+      <div class="formula-box">
+        \[ \frac{18}{27} = \frac{2}{3} \]
+      </div>
+      <p><strong>Пример 5.</strong> Сократим дробь \(\frac{21}{28}\). Чтобы сократить эту дробь, нужно ее числитель и знаменатель разделить на наибольший общий делитель чисел 21 и 28. НОД(21 и 28)=7. Значит, делим числитель и знаменатель дроби на 7:</p>
+      <div class="formula-box">
+        \[ \frac{21}{28} = \frac{3}{4} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 5: Расширение ===== -->
+  <section class="slide" data-index="4">
+    <h2>Основное свойство дроби. Расширение дроби</h2>
+    <div class="content-box">
+      <p>Значение дроби не изменится, если умножить её числитель и знаменатель на одно и то же число, отличное от нуля. Это преобразование называется <strong>расширением дроби</strong>. Оно лежит в основе приведения дробей к общему знаменателю.</p>
+      <div class="formula-box">
+        \[ \frac{5}{9} = \frac{5 \cdot 7}{9 \cdot 7} = \frac{35}{63} \quad \text{и} \quad \frac{2}{3} = \frac{2 \cdot 4}{3 \cdot 4} = \frac{8}{12} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 6: Выделение целой части 1 ===== -->
+  <section class="slide" data-index="5">
+    <h2>Выделение целой части</h2>
+    <div class="content-box">
+      <p>Для того, чтобы выделить целую часть из неправильной дроби, нужно разделить числитель на знаменатель с остатком.</p>
+      <p>Неполное частное – целая часть, остаток от деления – числитель дробной части, а знаменатель останется тем же.</p>
+      <p>Например, выделим целую часть в дроби \(\frac{5}{2}\). Записываем уголком деление и решаем:</p>
+      <div class="formula-box">
+        \[ \frac{5}{2} = 2 \frac{1}{2} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 7: Выделение целой части 2 ===== -->
+  <section class="slide" data-index="6">
+    <h2>Выделение целой части (продолжение)</h2>
+    <div class="content-box">
+      <p>Рассмотрим ещё один пример на выделение целой части. Пусть требуется выделить целую часть в дроби \(\frac{57}{6}\). Записываем деление уголком и решаем. Далее собираем смешанную дробь:</p>
+      <ul>
+        <li>Знаменатель дробной части — 6</li>
+        <li>Целая часть — 9</li>
+        <li>Числитель дробной части — 3</li>
+      </ul>
+      <div class="formula-box">
+        \[ \frac{57}{6} = 9 \frac{3}{6} = 9 \frac{1}{2} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 8: Замена смешанного числа ===== -->
+  <section class="slide" data-index="7">
+    <h2>Замена смешанного числа неправильной дробью</h2>
+    <div class="content-box">
+      <p>Для того, чтобы заменить смешанное число неправильной дробью, нужно умножить знаменатель на целую часть и прибавить числитель, записать полученный результат в числитель, а знаменатель останется тем же.</p>
+      <p>В качестве примера рассмотрим замену смешанного числа \(2 \frac{1}{3}\) неправильной дробью.</p>
+      <p>Умножаем знаменатель 3 на целую часть 2 и прибавляем числитель 1. Записываем полученное выражение в числитель, а знаменатель останется тем же. Выполняем вычисления.</p>
+      <div class="formula-box">
+        \[ 2 \frac{1}{3} = \frac{3 \cdot 2 + 1}{3} = \frac{6 + 1}{3} = \frac{7}{3} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 9: Замена смешанного числа 2 ===== -->
+  <section class="slide" data-index="8">
+    <h2>Замена смешанного числа (продолжение)</h2>
+    <div class="content-box">
+      <p>Рассмотрим еще один пример. Переведем смешанное число \(5 \frac{2}{7}\) в неправильную дробь.</p>
+      <p>Умножаем знаменатель дробной части 7 на целую часть смешанного числа 5 и прибавляем числитель дробной части 2, а знаменатель оставляем прежним:</p>
+      <div class="formula-box">
+        \[ 5 \frac{2}{7} = \frac{7 \cdot 5 + 2}{7} = \frac{35 + 2}{7} = \frac{37}{7} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 10: Сложение и вычитание (правила) ===== -->
+  <section class="slide" data-index="9">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p>При сложении дробей с одинаковыми знаменателями числители складывают, а знаменатель оставляют тот же.</p>
+      <p>При вычитании дробей с одинаковыми знаменателями из числителя уменьшаемого вычитают числитель вычитаемого, а знаменатель оставляют тот же.</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 11: Сложение (пример 1) ===== -->
+  <section class="slide" data-index="10">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p><strong>Пример 1.</strong> Найдите значение выражения: \(\frac{6}{11} + \frac{2}{11}\)</p>
+      <p><strong>Решение.</strong> Применяем правило сложения дробей с одинаковыми знаменателями:</p>
+      <div class="formula-box">
+        \[ \frac{6}{11} + \frac{2}{11} = \frac{6+2}{11} = \frac{8}{11} \]
+      </div>
+      <p><strong>Ответ:</strong> \(\frac{8}{11}\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 12: Вычитание (пример 2) ===== -->
+  <section class="slide" data-index="11">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p><strong>Пример 2.</strong> Найдите значение выражения: \(\frac{6}{11} - \frac{2}{11}\)</p>
+      <p><strong>Решение.</strong> Применяем правило вычитания дробей с одинаковыми знаменателями:</p>
+      <div class="formula-box">
+        \[ \frac{6}{11} - \frac{2}{11} = \frac{6 - 2}{11} = \frac{4}{11} \]
+      </div>
+      <p><strong>Ответ:</strong> \(\frac{4}{11}\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 13: Разные знаменатели (пример 1) ===== -->
+  <section class="slide" data-index="12">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p>Чтобы сложить или вычесть дроби с разными знаменателями, надо сначала привести их к наименьшему общему знаменателю, а затем выполнить сложение или вычитание, применяя соответствующее правило сложения или вычитания дробей с одинаковыми знаменателями.</p>
+      <p>В некоторых случаях (если знаменатели – взаимно простые числа) общий знаменатель находится как произведение знаменателей данных дробей.</p>
+      <p><strong>Пример 1.</strong> Найдите значение выражения: \(\frac{5}{8} + \frac{7}{25}\). Приведём дроби к общему знаменателю и выполним арифметические действия:</p>
+      <div class="formula-box">
+        \[ \frac{5}{8} + \frac{7}{25} = \frac{5 \cdot 25 + 7 \cdot 8}{8 \cdot 25} = \frac{125 + 56}{200} = \frac{181}{200} = 0,905 \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 14: Разные знаменатели (пример 2) ===== -->
+  <section class="slide" data-index="13">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p>Если тема усвоена достаточно хорошо, лучше не просто находить произведение знаменателей данных дробей, а выбирать в качестве общего знаменателя их наименьшее общее кратное, когда это возможно.</p>
+      <p><strong>Пример 2.</strong> Найдите значение выражения: \(\frac{17}{28} - \frac{11}{21}\)</p>
+      <p><strong>Решение.</strong> Заметим, что \(28=7 \cdot 4\), а \(21=7 \cdot 3\). Поэтому наименьшим общим знаменателем дробей является \(7 \cdot 4 \cdot 3 = 84\). Приведём дроби к общему знаменателю и выполним арифметические действия:</p>
+      <div class="formula-box">
+        \[ \frac{17}{28} - \frac{11}{21} = \frac{17 \cdot 3}{28 \cdot 3} - \frac{11 \cdot 4}{21 \cdot 4} = \frac{51 - 44}{84} = \frac{7}{84} = \frac{1}{12} \]
+      </div>
+      <p><strong>Ответ:</strong> \(\frac{1}{12}\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 15: Разные знаменатели (пример 3) ===== -->
+  <section class="slide" data-index="14">
+    <h2>Сложение и вычитание</h2>
+    <div class="content-box">
+      <p><strong>Пример 3.</strong> Сложим дроби \(\frac{5}{18}\) и \(\frac{7}{12}\).</p>
+      <p>Наименьший общий знаменатель дробей равен 36. Дополнительным множителем для первой дроби является число 2, а для второй — число 3.</p>
+      <div class="formula-box">
+        \[ \frac{5}{18} + \frac{7}{12} = \frac{5 \cdot 2 + 7 \cdot 3}{36} = \frac{10 + 21}{36} = \frac{31}{36} \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 16: Умножение (правило + пример 1) ===== -->
+  <section class="slide" data-index="15">
+    <h2>Умножение и деление</h2>
+    <div class="content-box">
+      <p>Чтобы умножить дробь на дробь, надо перемножить их числители и их знаменатели и первое произведение записать в числителе, а второе в знаменателе.</p>
+      <p><strong>Пример 1.</strong> Выполним умножение: \(\frac{1}{7} \cdot \frac{2}{3}\)</p>
+      <p><strong>Решение.</strong></p>
+      <div class="formula-box">
+        \[ \frac{1}{7} \cdot \frac{2}{3} = \frac{1 \cdot 2}{7 \cdot 3} = \frac{2}{21} \]
+      </div>
+      <p><strong>Ответ:</strong> \(\frac{2}{21}\)</p>
+      <p>Очень часто при умножении дробей возникает возможность сокращения. Это позволяет получить более компактный ответ.</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 17: Умножение (пример 2, 3) ===== -->
+  <section class="slide" data-index="16">
+    <h2>Умножение и деление</h2>
+    <div class="content-box">
+      <p><strong>Пример 2.</strong> Выполним умножение: \(\frac{2}{5} \cdot \frac{3}{2}\)</p>
+      <p><strong>Решение.</strong> Применим правило умножения дробей и выполним сокращение дроби на 2:</p>
+      <div class="formula-box">
+        \[ \frac{2}{5} \cdot \frac{3}{2} = \frac{2 \cdot 3}{5 \cdot 2} = \frac{3}{5} = 0,6 \]
+      </div>
+      <p><strong>Ответ:</strong> 0,6.</p>
+    </div>
+    <div class="content-box">
+      <p><strong>Пример 3.</strong> Выполним умножение: \(\frac{11}{14} \cdot \frac{21}{22}\)</p>
+      <p><strong>Решение.</strong> Для начала заметим, что числители и знаменатели дробей содержат пары чисел, которые можно сократить (11 и 22 делятся на 11, 21 и 14 делятся на 7).</p>
+      <div class="formula-box">
+        \[ \frac{11}{14} \cdot \frac{21}{22} = \frac{11 \cdot 21}{14 \cdot 22} = \frac{1 \cdot 21}{14 \cdot 2} = \frac{1 \cdot 3}{2 \cdot 2} = \frac{3}{4} = 0,75 \]
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 18: Деление ===== -->
+  <section class="slide" data-index="17">
+    <h2>Умножение и деление</h2>
+    <div class="content-box">
+      <p>Чтобы разделить одну дробь на другую, надо делимое умножить на дробь, обратную делителю.</p>
+      <p><strong>Пример 1.</strong> Выполним деление: \(\frac{5}{7} : \frac{3}{5}\)</p>
+      <p><strong>Решение.</strong> Применим правило деления дробей. Умножаем первую дробь на дробь, обратную второй. Грубо говоря, умножаем первую дробь на перевёрнутую вторую:</p>
+      <div class="formula-box">
+        \[ \frac{5}{7} : \frac{3}{5} = \frac{5}{7} \cdot \frac{5}{3} = \frac{5 \cdot 5}{7 \cdot 3} = \frac{25}{21} = 1 \frac{4}{21} \]
+      </div>
+      <p><strong>Ответ:</strong> \(1 \frac{4}{21}\).</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 19: Умножение и деление смешанных чисел ===== -->
+  <section class="slide" data-index="18">
+    <h2>Умножение и деление смешанных чисел</h2>
+    <div class="content-box">
+      <p>При умножении и делении смешанных чисел их сначала нужно перевести в неправильные дроби, а затем выполнить действие по правилам умножения и деления обыкновенных дробей.</p>
+    </div>
+    
+    <div class="flex-row">
+      <div class="content-box" style="flex: 1;">
+        <h3>Умножение:</h3>
+        <p><strong>Пример 1.</strong> \(1 \frac{1}{2} \cdot \frac{2}{3}\)</p>
+        <div class="formula-box" style="font-size: clamp(18px, 2vw, 26px);">
+          \[ 1 \frac{1}{2} \cdot \frac{2}{3} = \frac{3}{2} \cdot \frac{2}{3} = 1 \]
+        </div>
+        <p><strong>Пример 2.</strong> \(2 \frac{1}{2} \cdot 1 \frac{3}{5}\)</p>
+        <div class="formula-box" style="font-size: clamp(18px, 2vw, 26px);">
+          \[ 2 \frac{1}{2} \cdot 1 \frac{3}{5} = \frac{5}{2} \cdot \frac{8}{5} = \frac{8}{2} = 4 \]
+        </div>
+      </div>
+
+      <div class="content-box" style="flex: 1;">
+        <h3>Деление:</h3>
+        <p><strong>Пример 3.</strong> \(2 \frac{1}{4} : 1 \frac{1}{2}\)</p>
+        <div class="formula-box" style="font-size: clamp(18px, 2vw, 26px);">
+          \[ 2 \frac{1}{4} : 1 \frac{1}{2} = \frac{9}{4} : \frac{3}{2} = \frac{9}{4} \cdot \frac{2}{3} = \frac{18}{12} = 1 \frac{1}{2} \]
+        </div>
+        <p><strong>Пример 4.</strong> \(3 \frac{1}{3} : 1 \frac{2}{3}\)</p>
+        <div class="formula-box" style="font-size: clamp(18px, 2vw, 26px);">
+          \[ 3 \frac{1}{3} : 1 \frac{2}{3} = \frac{10}{3} : \frac{5}{3} = \frac{10}{3} \cdot \frac{3}{5} = \frac{10}{5} = 2 \]
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progressBar');
+
+  function showSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= total) index = total - 1;
+
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    current = index;
+
+    counter.textContent = (current + 1) + ' / ' + total;
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+    progressBar.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function changeSlide(delta) {
+    showSlide(current + delta);
+  }
+
+  // Клавиатура
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      changeSlide(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      changeSlide(-1);
+    } else if (e.key === 'Home') {
+      showSlide(0);
+    } else if (e.key === 'End') {
+      showSlide(total - 1);
+    }
+  });
+
+  // Свайпы
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      changeSlide(diff > 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>

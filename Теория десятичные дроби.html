@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Презентация: Всё о десятичных дробях</title>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', scale: 0.95 }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  /* ===== Базовые настройки ===== */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #1a1a2e;
+    font-family: "Times New Roman", Times, serif;
+    color: #e0e0e0;
+    overflow: hidden;
+  }
+
+  /* ===== Слайдер ===== */
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3vh 5vw;
+    animation: fadeIn 0.4s ease;
+    overflow-y: auto;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Типографика ===== */
+  h1 {
+    font-size: clamp(26px, 4vw, 52px);
+    text-align: center;
+    margin: 0 0 1.5vh;
+    line-height: 1.2;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  h2 {
+    font-size: clamp(20px, 3vw, 40px);
+    text-align: center;
+    margin: 0 0 3vh;
+    color: #ffffff;
+    border-bottom: 2px solid #4a4a8a;
+    padding-bottom: 1.5vh;
+    width: 100%;
+    max-width: 1100px;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: clamp(18px, 2.4vw, 30px);
+    color: #c0c0e8;
+    margin: 2vh 0 1vh;
+    text-align: left;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  p, li {
+    font-size: clamp(16px, 2vw, 24px);
+    line-height: 1.6;
+    color: #d0d0f0;
+    margin: 0.8vh 0;
+  }
+
+  ul, ol {
+    padding-left: 3vw;
+    margin: 1vh 0;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  li {
+    margin-bottom: 1vh;
+  }
+
+  /* ===== Контентные блоки ===== */
+  .content-box {
+    width: 100%;
+    max-width: 1100px;
+    background: rgba(255,255,255,0.04);
+    border-left: 4px solid #4a6aff;
+    border-radius: 8px;
+    padding: 2vh 3vw;
+    margin-bottom: 2vh;
+  }
+
+  .formula-box {
+    font-size: clamp(20px, 2.6vw, 34px);
+    text-align: center;
+    margin: 2vh 0;
+    color: #ffffff;
+    background: rgba(74, 106, 255, 0.1);
+    padding: 1.5vh;
+    border-radius: 8px;
+  }
+
+  .highlight { color: #ffaa4a; font-weight: bold; }
+  .answer { color: #6aff8a; font-weight: bold; }
+
+  .flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2vw 4vw;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 1.5vh;
+  }
+
+  .flex-item {
+    flex: 1 1 250px;
+    font-size: clamp(16px, 2vw, 24px);
+  }
+
+  /* ===== Специально для разрядов ===== */
+  .digits-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4vh 0;
+    width: 100%;
+    max-width: 800px;
+    background: rgba(255,255,255,0.04);
+    padding: 4vh 2vw;
+    border-radius: 12px;
+    border-left: 4px solid #4a6aff;
+  }
+  
+  .digits-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin-bottom: 2vh;
+  }
+
+  .digit {
+    width: 60px;
+    text-align: center;
+    font-size: clamp(24px, 3.5vw, 44px);
+    font-weight: bold;
+    color: #fff;
+    position: relative;
+    margin: 0 4px;
+  }
+  
+  .comma {
+    width: 30px;
+    text-align: center;
+    font-size: clamp(24px, 3.5vw, 44px);
+    font-weight: bold;
+    color: #fff;
+    margin: 0 4px;
+  }
+
+  .digit-label {
+    width: 80px;
+    text-align: center;
+    font-size: clamp(12px, 1.4vw, 18px);
+    color: #8888bb;
+    margin: 0 4px;
+    line-height: 1.2;
+  }
+
+  .digit-header {
+    width: 80px;
+    text-align: center;
+    font-size: clamp(14px, 1.6vw, 20px);
+    color: #ffaa4a;
+    font-weight: bold;
+    margin: 0 4px;
+  }
+
+  /* ===== Навигация ===== */
+  .nav {
+    position: fixed;
+    bottom: 2vh;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2vw;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .nav button {
+    pointer-events: auto;
+    background: #2a2a4a;
+    color: #c0c0e0;
+    border: 1.5px solid #4a4a8a;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: clamp(14px, 1.4vw, 18px);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .nav button:hover {
+    background: #3a3a6a;
+    border-color: #6a6ab0;
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .nav .counter {
+    color: #6a6a9a;
+    font-size: clamp(14px, 1.4vw, 18px);
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* ===== Прогресс-бар ===== */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4a6aff, #7a4aff);
+    transition: width 0.35s ease;
+    z-index: 200;
+  }
+
+  /* ===== Подсказка ===== */
+  .hint {
+    position: fixed;
+    top: 2vh;
+    right: 2vw;
+    font-size: 13px;
+    color: #4a4a6a;
+    z-index: 100;
+    font-family: sans-serif;
+  }
+
+  /* ===== Адаптивность ===== */
+  @media (max-width: 700px) {
+    .flex-row { flex-direction: column; gap: 1vh; }
+    ul, ol { padding-left: 5vw; }
+    .digit, .comma { width: 40px; margin: 0 2px; }
+    .digit-label, .digit-header { width: 50px; margin: 0 2px; }
+  }
+
+  /* ===== Печать ===== */
+  @media print {
+    html, body { background: #fff; overflow: visible; height: auto; }
+    .presentation { display: block; height: auto; }
+    .slide {
+      display: block !important;
+      page-break-after: always;
+      padding: 12mm;
+      color: #000;
+      background: #fff;
+      overflow: visible;
+    }
+    .slide h1, .slide h2, .slide h3 { color: #000; }
+    .slide h2 { border-bottom-color: #888; }
+    p, li, .content-box, .formula-box, .digits-container { color: #000; }
+    .content-box, .digits-container { background: #f5f5f5; border-color: #888; }
+    .formula-box { background: #f0f0f0; }
+    .highlight { color: #c06000; }
+    .answer { color: #008000; }
+    .digit, .comma { color: #000; }
+    .nav, .progress, .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Прогресс-бар -->
+<div class="progress" id="progressBar"></div>
+
+<!-- Подсказка -->
+<div class="hint">← → для навигации</div>
+
+<!-- Навигация -->
+<div class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)">← Назад</button>
+  <span class="counter" id="counter">1 / 14</span>
+  <button id="nextBtn" onclick="changeSlide(1)">Вперёд →</button>
+</div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ===== СЛАЙД 1: Титульный ===== -->
+  <section class="slide active" data-index="0">
+    <h1>ВСЁ о десятичных дробях</h1>
+  </section>
+
+  <!-- ===== СЛАЙД 2: Содержание ===== -->
+  <section class="slide" data-index="1">
+    <h2>Содержание</h2>
+    <div class="content-box">
+      <ul style="list-style-type: none; padding-left: 0;">
+        <li>• Понятие о десятичной дроби</li>
+        <li>• Сравнение десятичных дробей</li>
+        <li>• Сложение и вычитание десятичных дробей</li>
+        <li>• Умножение десятичной дроби на натуральное число</li>
+        <li>• Умножение десятичных дробей</li>
+        <li>• Деление десятичной дроби на натуральное число</li>
+        <li>• Деление десятичных дробей</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 3: Для чего нужны ===== -->
+  <section class="slide" data-index="2">
+    <h2>Для чего нужны десятичные дроби</h2>
+    <div class="content-box">
+      <p>• Десятичные дроби необходимы при решении профессиональных задач в строительстве, кулинарии, бухгалтерской деятельности, при составлении планов и графиков, начислении зарплаты, при работе на компьютере и т.д.</p>
+      <p>• Десятичные дроби нужны в повседневной жизни при решении бытовых задач — оплата коммунальных услуг, расчет в магазинах, приготовление блюд по рецепту, во время ремонта квартиры, при шитье и другие.</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 4: История ===== -->
+  <section class="slide" data-index="3">
+    <h2>Немного истории</h2>
+    <div class="content-box">
+      <p>• В первых учебниках математики — «ломаные числа».</p>
+      <p>• Десятичные дроби используют чаще, чем обыкновенные. Это связано с простотой правил вычислений.</p>
+      <p>• Правила вычислений с десятичными дробями описал знаменитый ученый средневековья аль-Каши.</p>
+      <p>• Записывал аль-Каши десятичные дроби так же, как принято сейчас, но он не пользовался запятой: дробную часть он записывал красными чернилами или отделял вертикальной чертой.</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 5: Понятие ===== -->
+  <section class="slide" data-index="4">
+    <h2>Понятие о десятичной дроби</h2>
+    <div class="content-box">
+      <p>Обыкновенные дроби со знаменателями 10; 100; 1000 и т.д. (т.е. записанные одной единицей и несколькими нулями) получили специальное название — <span class="highlight">десятичные</span>.</p>
+      <p>Такие дроби условились записывать без знаменателя.</p>
+    </div>
+    <h3>Виды десятичных дробей:</h3>
+    <div class="content-box">
+      <p>1). Конечные: \(5,2\)</p>
+      <p>2). Бесконечные: \(2,38946...\)</p>
+      <p>3). Бесконечные периодические: \(0,166666....\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 6: Алгоритм записи ===== -->
+  <section class="slide" data-index="5">
+    <h2>Алгоритм записи обыкновенной дроби в виде десятичной</h2>
+    <div class="content-box">
+      <p>1. Записываем целую часть числа и ставим запятую.</p>
+      <p>2. После запятой поставим столько точек, сколько нулей в знаменателе дробной части.</p>
+      <p>3. С последней точки записываем числитель, начиная с последнего знака.</p>
+      <p>4. Оставшиеся точки заполняем нулями.</p>
+    </div>
+    <div class="formula-box">
+      \(12 \frac{25}{100} = 12,25\) <br><br>
+      \(8 \frac{13}{10000} = 8,0013\)
+    </div>
+    <div class="content-box">
+      <p>Если в числителе дроби цифр меньше, чем нулей в знаменателе, то:</p>
+      <div class="formula-box" style="background: transparent;">
+        \(\frac{7}{100} = \frac{07}{100} = 0,07\)<br><br>
+        \(\frac{47}{10000} = \frac{0047}{10000} = 0,0047\)
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 7: Разряды ===== -->
+  <section class="slide" data-index="6">
+    <h2>Разряды десятичной дроби</h2>
+    
+    <div class="digits-container">
+      <!-- Верхний ряд: названия разрядов -->
+      <div class="digits-row">
+        <div class="digit-header" style="color: #fff;">Целые</div>
+        <div class="digit-header"></div>
+        <div class="digit-header">Десятые</div>
+        <div class="digit-header">Сотые</div>
+        <div class="digit-header">Тысячные</div>
+        <div class="digit-header">Десяти-<br>тысячные</div>
+      </div>
+      
+      <!-- Нижний ряд: сами цифры -->
+      <div class="digits-row">
+        <div class="digit" style="color: #ffaa4a;">4</div>
+        <div class="digit" style="color: #ffaa4a;">3</div>
+        <div class="comma">,</div>
+        <div class="digit">7</div>
+        <div class="digit">5</div>
+        <div class="digit">6</div>
+        <div class="digit">9</div>
+      </div>
+    </div>
+
+    <h3>При чтении десятичной дроби:</h3>
+    <div class="content-box">
+      <p>Сначала называют её целую часть, добавляя слово «целых», а затем называют дробную часть, добавляя название последнего разряда.</p>
+      <p>\(9,0036\) — девять целых тридцать шесть десятитысячных</p>
+      <p>\(0,61\) — ноль целых шестьдесят одна сотая</p>
+      <p>\(11,05\) — одиннадцать целых пять сотых</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 8: Перевод дробей ===== -->
+  <section class="slide" data-index="7">
+    <h2>Перевод дробей</h2>
+    <h3>Записать десятичную дробь:</h3>
+    <div class="content-box">
+      <p>1). в которой 2 целых 3 десятых и 5 сотых; <span class="answer">(2,35)</span></p>
+      <p>2). в которой 0 целых 7 сотых; <span class="answer">(0,07)</span></p>
+      <p>3). в которой 13 целых 6 десятых; <span class="answer">(13,6)</span></p>
+      <p>4). в которой 3 целых 1 десятая и 5 тысячных; <span class="answer">(3,105)</span></p>
+    </div>
+    <h3>Как записать десятичную дробь в виде обыкновенной:</h3>
+    <div class="formula-box">
+      \(5,013 = 5 \frac{13}{1000}\)
+    </div>
+    <div class="content-box">
+      <p>Запишите в виде обыкновенной дроби:</p>
+      <p>1). \(1,8 = 1 \frac{8}{10}\)</p>
+      <p>2). \(0,75 = \frac{75}{100}\)</p>
+      <p>3). \(6,056 = 6 \frac{56}{1000}\)</p>
+      <p>4). \(2,25 = 2 \frac{25}{100}\)</p>
+      <p>5). \(0,04 = \frac{4}{100}\)</p>
+      <p>6). \(33,0001 = 33 \frac{1}{10000}\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 9: Сравнение дробей ===== -->
+  <section class="slide" data-index="8">
+    <h2>Сравнение десятичных дробей</h2>
+    <div class="content-box">
+      <p>1). Если к десятичной дроби справа приписать любое количество нулей, то дробь не изменится.</p>
+      <p>2). Если десятичная дробь оканчивается нулями, то эти нули можно отбросить, при этом получится дробь, равная данной.</p>
+      <p>3). Из двух дробей больше та, у которой целая часть больше.</p>
+      <p>4). Если у дробей целая часть одинаковая, то сравниваются их дробные части. Для сравнения дробной части надо сначала уравнять количество цифр после запятой, приписав нужное количество нулей к одной из дробей.</p>
+    </div>
+    <div class="content-box">
+      <h3>Примеры:</h3>
+      <p>\(3,2 = 3,20 = 3,2000\)</p>
+      <p>\(5,4 > 4,98542\)</p>
+      <p>\(10,0305 < 17,999\)</p>
+      <p>\(9,4 < 9,6\)</p>
+      <p>\(6,30 < 6,31\)</p>
+      <p>\(0,100 > 0,065\)</p>
+      <p>\(185,486 < 185,50\)</p>
+    </div>
+    <div class="content-box">
+      <h3>Задание (сравните):</h3>
+      <p>\(6,37\) и \(6,299\) <br> \(10,1\) и \(10,099\) <br> \(9,18\) и \(9,1798\) <br> \(7,01\) и \(7,018\) <br> \(9,004\) и \(9,04\) <br> \(28,028\) и \(28,0209\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 10: Сложение и вычитание ===== -->
+  <section class="slide" data-index="9">
+    <h2>Сложение и вычитание десятичных дробей</h2>
+    <div class="content-box">
+      <h3>Чтобы сложить (вычесть) десятичные дроби, нужно:</h3>
+      <p>1. Уравнять в этих дробях количество знаков после запятой.</p>
+      <p>2. Записать их в столбик так, чтобы запятая была записана под запятой.</p>
+      <p>3. Выполнить сложение (вычитание), не обращая внимания на запятую.</p>
+      <p>4. Поставить в ответе запятую под запятой.</p>
+    </div>
+    <div class="flex-row">
+      <div class="content-box" style="flex: 1;">
+        <p style="text-align: center;"><strong>Сложение:</strong></p>
+        <p style="text-align: center; font-family: monospace; font-size: clamp(18px, 2.2vw, 26px); line-height: 1.2;">
+          &nbsp;&nbsp;3,44<br>
+          + 7,28<br>
+          --------<br>
+          10,72
+        </p>
+      </div>
+      <div class="content-box" style="flex: 1;">
+        <p style="text-align: center;"><strong>Вычитание:</strong></p>
+        <p style="text-align: center; font-family: monospace; font-size: clamp(18px, 2.2vw, 26px); line-height: 1.2;">
+          &nbsp;24,700<br>
+          - 6,835<br>
+          --------<br>
+          &nbsp;17,865
+        </p>
+      </div>
+    </div>
+    <div class="content-box">
+      <h3>Свойства сложения:</h3>
+      <p>\(a + b = b + a\) (переместительное)</p>
+      <p>\((a + b) + c = a + (b + c)\) (сочетательное)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 11: Умножение на натуральное число ===== -->
+  <section class="slide" data-index="10">
+    <h2>Умножение десятичной дроби на натуральное число</h2>
+    <div class="content-box">
+      <h3>Правило:</h3>
+      <p>1). Умножить дробь на число, не обращая внимание на запятую.</p>
+      <p>2). В полученном произведении отделить запятой столько цифр справа, сколько их после запятой в дроби.</p>
+    </div>
+    <div class="content-box">
+      <h3>Умножение на 10, 100, 1000 и т.д.:</h3>
+      <p>Чтобы умножить десятичную дробь на 10, 100, 1000 и т.д., нужно запятую перенести вправо на столько цифр, сколько нулей стоит в множителе после единицы.</p>
+      <p>\(0,368 \cdot 10 = 3,68\)</p>
+      <p>\(0,368 \cdot 100 = 36,8\)</p>
+      <p>\(2,532 \cdot 1000 = 2532\)</p>
+    </div>
+    <div class="content-box">
+      <h3>Задание (выполните умножение):</h3>
+      <p>а) \(1,6 \cdot 4\)</p>
+      <p>б) \(3,45 \cdot 6\)</p>
+      <p>в) \(4,55 \cdot 12\)</p>
+      <p>г) \(3,426 \cdot 5\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 12: Умножение дробей ===== -->
+  <section class="slide" data-index="11">
+    <h2>Умножение десятичных дробей</h2>
+    <div class="content-box">
+      <h3>Как умножить дробь на дробь?</h3>
+      <p>1). Выполнить умножение, не обращая внимания на запятые.</p>
+      <p>2). В полученном произведении отделить запятой столько цифр справа, сколько их стоит после запятой в обоих множителях вместе.</p>
+    </div>
+    <div class="content-box">
+      <h3>Пример:</h3>
+      <p>\(2,45 \cdot 4,6 = 11,27\) (2 знака + 1 знак = 3 знака)</p>
+      <p>\(0,000024 \cdot 7,6 = 0,0001824\) (6 знаков + 1 знак = 7 знаков)</p>
+    </div>
+    <div class="content-box">
+      <h3>Задание (решите самостоятельно):</h3>
+      <p>1). \(85,3 \cdot 4,1\)</p>
+      <p>2). \(6,36 \cdot 32,5\)</p>
+      <p>3). \(27,2 \cdot 4,8\)</p>
+      <p>4). \(1,56 \cdot 20,7\)</p>
+      <p style="margin-top: 15px;"><strong>Ответы:</strong> 1). 349,73; 2). 206,7; 3). 130,56; 4). 32,292</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 13: Деление на натуральное число ===== -->
+  <section class="slide" data-index="12">
+    <h2>Деление десятичной дроби на натуральное число</h2>
+    <div class="content-box">
+      <h3>Правило:</h3>
+      <p>1) Разделить дробь на это число, не обращая внимания на запятую.</p>
+      <p>2) Поставить в частном запятую, когда кончится деление целой части.</p>
+    </div>
+    <div class="content-box">
+      <h3>Деление на 10, 100, 1000 и т.д.:</h3>
+      <p>Чтобы разделить десятичную дробь на 10, 100, 1000 и т.д., нужно запятую перенести влево на столько цифр, сколько нулей стоит в делителе после единицы.</p>
+      <p>\(713,23 : 10 = 71,323\)</p>
+      <p>\(713,23 : 100 = 7,1323\)</p>
+    </div>
+    <div class="content-box">
+      <h3>Определите место запятой в частном:</h3>
+      <p>\(152,39 : 100 = ...\)</p>
+      <p>\(152,39 : 10 = ...\)</p>
+      <p>\(152,39 : 1000 = ...\)</p>
+      <p>\(152,39 : 10000 = ...\)</p>
+    </div>
+  </section>
+
+  <!-- ===== СЛАЙД 14: Деление десятичных дробей ===== -->
+  <section class="slide" data-index="13">
+    <h2>Деление десятичных дробей</h2>
+    <div class="content-box">
+      <h3>Правило:</h3>
+      <p>1. В делимом и делителе перенести запятую на столько цифр, сколько их после запятой в делителе.</p>
+      <p>2. После этого выполнить деление на натуральное число.</p>
+    </div>
+    <div class="content-box">
+      <h3>Пример:</h3>
+      <p>\(41,58 : 5,4\)</p>
+      <p>В делителе (5,4) один знак после запятой. Переносим запятую в делимом и делителе на один знак вправо: \(415,8 : 54\).</p>
+      <p>Выполняем деление: \(415,8 : 54 = 7,7\).</p>
+      <p><strong>Ответ:</strong> \(41,58 : 5,4 = 7,7\)</p>
+    </div>
+    <div class="content-box">
+      <h3>Вычислите сами:</h3>
+      <p>\(52,46 : 1,72\)</p>
+      <p>\(0,0722 : 0,19\)</p>
+      <p>\(19,712 : 2,8\)</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progressBar');
+
+  function showSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= total) index = total - 1;
+
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    current = index;
+
+    counter.textContent = (current + 1) + ' / ' + total;
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === total - 1);
+    progressBar.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function changeSlide(delta) {
+    showSlide(current + delta);
+  }
+
+  // Клавиатура
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      changeSlide(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      changeSlide(-1);
+    } else if (e.key === 'Home') {
+      showSlide(0);
+    } else if (e.key === 'End') {
+      showSlide(total - 1);
+    }
+  });
+
+  // Свайпы
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      changeSlide(diff > 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>
