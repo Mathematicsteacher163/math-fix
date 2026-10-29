@@ -13,20 +13,88 @@
     background: #1a1a2e;
     font-family: "Times New Roman", Times, serif;
     color: #e0e0e0;
+    transition: background 0.2s;
   }
+
+  /* ===== Переключатель режима ===== */
+  .mode-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    display: flex;
+    gap: 6px;
+    background: rgba(26, 26, 46, 0.92);
+    border: 1.5px solid #4a4a8a;
+    border-radius: 40px;
+    padding: 5px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+  .mode-toggle button {
+    border: none;
+    background: transparent;
+    color: #a0a0c0;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .mode-toggle button:hover { color: #fff; background: rgba(74,106,255,0.18); }
+  .mode-toggle button.active {
+    background: #4a6aff;
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(74,106,255,0.45);
+  }
+
+  /* ===== Режим «Телефон» ===== */
+  body.phone-mode {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 12px;
+  }
+  body.phone-mode .page-shell {
+    width: 100%;
+    max-width: 420px;
+    min-height: calc(100vh - 24px);
+    background: #15152a;
+    border-radius: 28px;
+    border: 1.5px solid #3a3a6a;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+    overflow: hidden;
+    position: relative;
+  }
+  body.phone-mode .header { padding: 5vh 5vw 3vh; }
+  body.phone-mode .header h1 { font-size: 30px; }
+  body.phone-mode .header p { font-size: 15px; }
+  body.phone-mode .menu { padding: 2vh 4vw 10vh; gap: 1.2vh; }
+  body.phone-mode .section-title { font-size: 15px; margin: 2.5vh 0 1vh; }
+  body.phone-mode .menu a { font-size: 15px; padding: 14px 16px; gap: 10px; }
+  body.phone-mode .footer { font-size: 11px; padding-bottom: 6vh; }
+
+  /* ===== Режим «Компьютер» ===== */
+  body.desktop-mode .page-shell { width: 100%; }
+
+  /* ===== Основное содержимое ===== */
+  .page-shell { transition: max-width 0.25s ease; }
 
   .header {
     text-align: center;
     padding: 6vh 5vw 3vh;
   }
-
   .header h1 {
     font-size: clamp(28px, 5vw, 52px);
     margin: 0 0 1.5vh;
     color: #ffffff;
     line-height: 1.2;
   }
-
   .header p {
     font-size: clamp(15px, 2vw, 22px);
     color: #a0a0c0;
@@ -65,26 +133,16 @@
     line-height: 1.4;
     transition: background 0.2s, border-color 0.2s, transform 0.15s;
   }
-
   .menu a:hover {
     background: rgba(74, 106, 255, 0.15);
     border-left-color: #7a9aff;
     transform: translateX(4px);
   }
-
-  .menu a .arrow {
-    color: #6a6ab0;
-    font-size: 1.2em;
-    flex-shrink: 0;
-  }
-
+  .menu a .arrow { color: #6a6ab0; font-size: 1.2em; flex-shrink: 0; }
   .menu a.theory { border-left-color: #6aff8a; }
-
   .menu a.trainer { border-left-color: #4a6aff; background: rgba(74, 106, 255, 0.08); }
   .menu a.trainer:hover { border-left-color: #7a9aff; background: rgba(74, 106, 255, 0.18); }
-
   .menu a.theory:hover { border-left-color: #8affa8; background: rgba(106, 255, 138, 0.1); }
-
   .menu a.tasks { border-left-color: #ffaa4a; }
   .menu a.tasks:hover { border-left-color: #ffc47a; background: rgba(255, 170, 74, 0.1); }
 
@@ -94,86 +152,133 @@
     font-size: 13px;
     color: #4a4a6a;
   }
+
+  /* На телефоне кнопка переключателя — внизу */
+  @media (max-width: 600px) {
+    .mode-toggle {
+      top: auto;
+      bottom: 14px;
+      right: 50%;
+      transform: translateX(50%);
+      padding: 4px;
+    }
+    .mode-toggle button { font-size: 13px; padding: 7px 12px; }
+  }
 </style>
 </head>
-<body>
+<body class="desktop-mode">
 
-  <div class="header">
-    <h1>Математика</h1>
-    <p>Учебные материалы и задания</p>
+  <!-- Переключатель режима просмотра -->
+  <div class="mode-toggle" role="group" aria-label="Режим просмотра">
+    <button type="button" id="btnDesktop" onclick="setMode('desktop')" title="Режим компьютера">
+      <span>🖥️</span><span>Компьютер</span>
+    </button>
+    <button type="button" id="btnPhone" onclick="setMode('phone')" title="Режим телефона">
+      <span>📱</span><span>Телефон</span>
+    </button>
   </div>
 
-  <div class="menu">
+  <div class="page-shell">
+    <div class="header">
+      <h1>Математика</h1>
+      <p>Учебные материалы и задания</p>
+    </div>
 
-    <div class="section-title">📘 ТЕОРИЯ </div>
+    <div class="menu">
+      <div class="section-title">📘 ТЕОРИЯ</div>
 
-    <a class="theory" href="Теория десятичные дроби.html">
-      <span>Урок №1. Всё о десятичных дробях</span>
-      <span class="arrow">→</span>
-    </a>
+      <a class="theory" href="Теория десятичные дроби.html">
+        <span>Урок №1. Всё о десятичных дробях</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="theory" href="Теория. Обыкновенные дроби.html">
+        <span>Урок №2. Правила действий с обыкновенными дробями</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="theory" href="Теория. Положительные и отрицательные числа.html">
+        <span>Урок №3. Положительные и отрицательные числа</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="theory" href="Теория. Уравнения.html">
+        <span>Урок №4. Уравнения с одной переменной</span>
+        <span class="arrow">→</span>
+      </a>
 
-    <a class="theory" href="Теория. Обыкновенные дроби.html">
-      <span>Урок №2. Правила действий с обыкновенными дробями</span>
-      <span class="arrow">→</span>
-    </a>
+      <div class="section-title">📝 ЗАДАНИЯ ДЛЯ ТРЕНИРОВКИ</div>
 
-    <a class="theory" href="Теория. Положительные и отрицательные числа.html">
-      <span> Урок №3. Положительные и отрицательные числа</span>
-      <span class="arrow">→</span>
-    </a>
+      <a class="tasks" href="1 Урок. Действия с десятичными дробями.html">
+        <span>1 урок. Действия с десятичными дробями</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="2 Урок. Обыкновенные дроби. Основы.html">
+        <span>2 урок. Обыкновенные дроби. Основы</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="3 Урок. Обыкновенные дроби. Сложение и вычитание.html">
+        <span>3 урок. Сложение и вычитание обыкновенных дробей</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="4 Урок. Обыкновенные дроби. Умножение и деление.html">
+        <span>4 урок. Умножение и деление обыкновенных дробей</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="5 Урок. Обыкновенны дроби. Комбинация чисел.html">
+        <span>5 урок. Комбинированные действия с дробями</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="6 урок. Положительные и отрицательные числа.html">
+        <span>6 урок. Действия с положительными и отрицательными числами</span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="tasks" href="7 урок. Решение уравнений.html">
+        <span>7 урок. Решение уравнений</span>
+        <span class="arrow">→</span>
+      </a>
 
-    <a class="theory" href="Теория. Уравнения.html">
-      <span>Урок №4. Уравнения с одной переменной</span>
-      <span class="arrow">→</span>
-    </a>
+      <div class="section-title">🎯 Тренажёры</div>
 
-    <div class="section-title">📝 ЗАДАНИЯ ДЛЯ ТРЕНИРОВКИ </div>
+      <a class="trainer" href="Версия2.html">
+        <span>Тренажёр устного счёта</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
 
-    <a class="tasks" href="1 Урок. Действия с десятичными дробями.html">
-      <span>1 урок. Действия с десятичными дробями</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="2 Урок. Обыкновенные дроби. Основы.html">
-      <span>2 урок. Обыкновенные дроби. Основы</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="3 Урок. Обыкновенные дроби. Сложение и вычитание.html">
-      <span>3 урок. Сложение и вычитание обыкновенных дробей</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="4 Урок. Обыкновенные дроби. Умножение и деление.html">
-      <span>4 урок. Умножение и деление обыкновенных дробей</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="5 Урок. Обыкновенны дроби. Комбинация чисел.html">
-      <span>5 урок. Комбинированные действия с дробями</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="6 урок. Положительные и отрицательные числа.html">
-      <span>6 урок. Действия с положительными и отрицательными числами</span>
-      <span class="arrow">→</span>
-    </a>
-
-    <a class="tasks" href="7 урок. Решение уравнений.html">
-      <span>7 урок. Решение уравнений</span>
-      <span class="arrow">→</span>
-    </a>
-    <div class="section-title">🎯 Тренажёры</div>
-
-    <a class="trainer" href="Версия2.html">
-      <span>Тренажёр устного счёта</span>
-      <span class="arrow">→</span>
-    </a>
+    <div class="footer">
+      Математика · учебные презентации
+    </div>
   </div>
 
-  <div class="footer">
-    Математика · учебные презентации
-  </div>
+<script>
+  (function () {
+    const STORAGE_KEY = 'math_site_view_mode';
 
+    function applyMode(mode) {
+      const body = document.body;
+      body.classList.remove('phone-mode', 'desktop-mode');
+      body.classList.add(mode === 'phone' ? 'phone-mode' : 'desktop-mode');
+
+      const btnD = document.getElementById('btnDesktop');
+      const btnP = document.getElementById('btnPhone');
+      if (mode === 'phone') {
+        btnP.classList.add('active');
+        btnD.classList.remove('active');
+      } else {
+        btnD.classList.add('active');
+        btnP.classList.remove('active');
+      }
+
+      try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) {}
+    }
+
+    window.setMode = function (mode) {
+      applyMode(mode);
+    };
+
+    // Восстановление режима при загрузке
+    let saved = 'desktop';
+    try { saved = localStorage.getItem(STORAGE_KEY) || 'desktop'; } catch (e) {}
+    applyMode(saved);
+  })();
+</script>
 </body>
 </html>
