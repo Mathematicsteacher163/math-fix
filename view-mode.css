@@ -1,4 +1,4 @@
-/* view-mode.css — переключатель и режимы просмотра */
+/* view-mode.css — переключатель, режимы и мобильная адаптация */
 
 /* ===== Переключатель ===== */
 .mode-toggle {
@@ -37,7 +37,7 @@
   box-shadow: 0 2px 10px rgba(74,106,255,0.45);
 }
 
-/* ===== Режим «Телефон»: сужаем САМ BODY ===== */
+/* ===== Режим «Телефон»: сужаем сам body ===== */
 body.phone-mode {
   display: flex !important;
   justify-content: center !important;
@@ -47,19 +47,16 @@ body.phone-mode {
   min-height: 100vh;
   box-sizing: border-box;
 }
-
-/* Внутренняя «рамка телефона» — псевдоэлемент-обёртка не нужен:
-   центрируем всё содержимое body и ограничиваем ширину через :where */
 body.phone-mode > *:not(.mode-toggle) {
   max-width: 420px;
   width: 100%;
   flex: 0 0 auto;
-  box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
-/* Если у страницы есть оболочка — оформляем её как экран смартфона */
+/* Оболочки страниц — как экран смартфона */
 body.phone-mode .page-shell,
 body.phone-mode .wrap,
 body.phone-mode .container,
@@ -67,9 +64,9 @@ body.phone-mode .app,
 body.phone-mode .main,
 body.phone-mode .content,
 body.phone-mode .wrapper,
-body.phone-mode .wrapper-main,
 body.phone-mode .page,
-body.phone-mode main {
+body.phone-mode main,
+body.phone-mode .presentation {
   max-width: 420px !important;
   width: 100% !important;
   min-height: calc(100vh - 24px);
@@ -85,14 +82,76 @@ body.phone-mode main {
   box-sizing: border-box;
 }
 
-/* Внутри рамки — уменьшенные отступы и шрифты */
-body.phone-mode .header { padding: 5vh 5vw 3vh; }
+/* ===== Универсальное увеличение шрифтов в телефонном режиме ===== */
+body.phone-mode {
+  font-size: 18px;
+}
+body.phone-mode p,
+body.phone-mode li,
+body.phone-mode .content-box,
+body.phone-mode .formula-box,
+body.phone-mode .task,
+body.phone-mode .question,
+body.phone-mode .text,
+body.phone-mode .answer,
+body.phone-mode .description,
+body.phone-mode .sub,
+body.phone-mode .info {
+  font-size: 19px !important;
+  line-height: 1.65 !important;
+}
+body.phone-mode h1 { font-size: 30px !important; line-height: 1.25 !important; }
+body.phone-mode h2 { font-size: 24px !important; }
+body.phone-mode h3 { font-size: 21px !important; }
+body.phone-mode small { font-size: 15px !important; }
+body.phone-mode .formula-box { font-size: 24px !important; padding: 2vh 4vw !important; }
+body.phone-mode .content-box,
+body.phone-mode .panel { padding: 2.5vh 5vw !important; margin-bottom: 2.5vh !important; }
+body.phone-mode ul,
+body.phone-mode ol { padding-left: 5vw !important; }
+body.phone-mode .flex-row { flex-direction: column !important; gap: 2vh !important; }
+body.phone-mode .flex-item { flex: 1 1 auto !important; }
+
+/* Слайды презентаций */
+body.phone-mode .slide {
+  padding: 4vh 6vw 12vh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pinch-zoom;
+}
+body.phone-mode .presentation {
+  height: auto !important;
+  min-height: calc(100vh - 24px);
+  align-items: flex-start !important;
+  touch-action: pan-y pinch-zoom;
+}
+body.phone-mode .nav { bottom: 1vh !important; gap: 3vw !important; }
+body.phone-mode .nav button { padding: 8px 16px !important; font-size: 13px !important; }
+body.phone-mode .nav .counter { font-size: 13px !important; min-width: 56px !important; }
+body.phone-mode .home-btn { padding: 6px 12px !important; font-size: 12px !important; top: 1.5vh !important; left: 3vw !important; }
+body.phone-mode .hint { display: none !important; }
+
+/* Разряды и таблицы — компактнее, но читаемо */
+body.phone-mode .digit,
+body.phone-mode .comma { width: 34px !important; font-size: 28px !important; margin: 0 1px !important; }
+body.phone-mode .digit-label,
+body.phone-mode .digit-header { width: 44px !important; font-size: 11px !important; margin: 0 1px !important; }
+
+/* Универсальные таблицы и поля ввода */
+body.phone-mode table { font-size: 16px !important; }
+body.phone-mode input,
+body.phone-mode select,
+body.phone-mode textarea,
+body.phone-mode button { font-size: 17px !important; }
+
+/* Кнопки и меню */
+body.phone-mode .header { padding: 5vh 5vw 3vh !important; }
 body.phone-mode .header h1 { font-size: 30px !important; }
 body.phone-mode .header p { font-size: 15px !important; }
-body.phone-mode .menu { padding: 2vh 4vw 10vh; gap: 1.2vh; }
-body.phone-mode .section-title { font-size: 15px !important; margin: 2.5vh 0 1vh; }
-body.phone-mode .menu a { font-size: 15px !important; padding: 14px 16px; gap: 10px; }
-body.phone-mode .footer { font-size: 11px !important; padding-bottom: 6vh; }
+body.phone-mode .menu { padding: 2vh 4vw 10vh !important; gap: 1.2vh !important; }
+body.phone-mode .section-title { font-size: 15px !important; margin: 2.5vh 0 1vh !important; }
+body.phone-mode .menu a { font-size: 15px !important; padding: 14px 16px !important; gap: 10px !important; }
+body.phone-mode .footer { font-size: 11px !important; padding-bottom: 6vh !important; }
 
 /* На узких экранах переключатель — внизу */
 @media (max-width: 600px) {
